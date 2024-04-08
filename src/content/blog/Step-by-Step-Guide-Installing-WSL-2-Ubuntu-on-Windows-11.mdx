@@ -32,13 +32,13 @@ Before getting started, ensure your system meets the following requirements:
 
 First, open PowerShell as an administrator. Execute the following command to enable Windows Subsystem for Linux (WSL):
 
-```powershell
+```shell
 dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
 ```
 
 Then, enable the Virtual Machine Platform feature by running:
 
-```powershell
+```shell
 dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
 ```
 
@@ -52,7 +52,7 @@ Head over to the Microsoft Store and search for Ubuntu. Download and install the
 
 Open PowerShell as an administrator and execute the following command to set WSL 2 as the default version:
 
-```powershell
+```shell
 wsl --set-default-version 2
 ```
 
