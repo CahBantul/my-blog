@@ -1,0 +1,112 @@
+---
+heroImage: /src/assets/images/pngegg.png
+category: Operating Systems
+description: >-
+  Discover the seamless integration of Docker on Windows 11 with Ubuntu through
+  WSL 2! Follow our step-by-step guide to unleash the power of containerization
+  and master Docker in no time.
+pubDate: 2024-04-08T17:00:00.000Z
+tags:
+  - ubuntu
+  - wsl
+  - windows
+  - docker
+title: ' A Step-by-Step Guide to Setting Up Docker on WSL 2 with Ubuntu on Windows 11'
+---
+
+In today's digital landscape, Docker has become an indispensable tool for developers and system administrators alike, enabling streamlined containerization and deployment of applications. In this comprehensive guide, we'll walk you through the process of installing Docker Engine on your WSL Ubuntu system on Windows 11, ensuring a smooth and hassle-free experience.
+
+## Step 1: Verify System Requirements:
+
+Before diving into the installation process, ensure that you're running the 64-bit version of one of the supported Ubuntu releases:
+
+* Ubuntu Mantic 23.10
+* Ubuntu Jammy 22.04 (LTS)
+* Ubuntu Focal 20.04 (LTS)
+  Additionally, Docker Engine is compatible with various architectures including x86\_64, armhf, arm64, s390x, and ppc64le.
+
+## Step 2: Uninstall Conflicting Packages:
+
+To prevent conflicts, it's crucial to uninstall any conflicting packages. This includes unofficial Docker distributions provided by Distro maintainers and dependencies such as containerd and runc.
+Run the following command to remove conflicting packages:
+
+```shell
+for pkg in docker.io docker - doc docker - compose docker - compose - v2 podman - docker containerd runc; do sudo apt - get remove $pkg; done
+
+```
+
+## Step 3:  Set Up Docker Repository:
+
+Begin by configuring Docker's apt repository on your system. This involves adding Docker's official GPG key and repository to Apt sources.
+
+```shell
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+```
+
+### Adding Docker's GPG Key:
+
+When software is distributed, it's essential to verify its authenticity to prevent tampering. GPG (GNU Privacy Guard) keys are cryptographic keys used to sign software packages, ensuring they come from a trusted source.
+
+* `sudo apt-get update`: This command updates the package index to ensure that the latest versions of packages are available for installation.
+* `sudo apt-get install ca-certificates curl`: Installs the `ca-certificates` and `curl` packages. `ca-certificates` provides a set of trusted certificate authorities needed for secure communication, while `curl` is a command-line utility for transferring data using various protocols.
+* `sudo install -m 0755 -d /etc/apt/keyrings`: Creates a directory `/etc/apt/keyrings` with the appropriate permissions (`-m 0755` sets the permissions to `rwxr-xr-x`).
+* `sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc`: Uses `curl` to download Docker's GPG key from `https://download.docker.com/linux/ubuntu/gpg` and saves it as `/etc/apt/keyrings/docker.asc`.
+* `sudo chmod a+r /etc/apt/keyrings/docker.asc`: Changes the permissions of the downloaded GPG key to make it readable (`a+r` means "add read permission for all users").
+
+### Adding Docker Repository to Apt Sources:
+
+Docker provides its software packages through repositories. This step adds Docker's repository to the list of sources that Apt (Advanced Package Tool) uses to find packages.
+
+* `echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null`: This command adds a new line to a file named `docker.list` in the `/etc/apt/sources.list.d/` directory. This line specifies the Docker repository URL (`https://download.docker.com/linux/ubuntu`), architecture (`$(dpkg --print-architecture)` dynamically detects the system architecture), GPG key location (`signed-by=/etc/apt/keyrings/docker.asc`), and the release codename (`$(. /etc/os-release && echo "$VERSION_CODENAME")` dynamically detects the Ubuntu release codename).
+
+### Updating Apt:
+
+* `sudo apt-get update`: This command updates the package index to reflect the changes made to the list of Apt sources.
+
+Overall, this script automates the process of setting up Docker on Ubuntu running within the Windows Subsystem for Linux 2 (WSL 2) environment on Windows 11, making it more convenient for users to install Docker and ensure the authenticity of the software packages they download.
+
+## Step 4: Install Docker Packages:
+
+With the repository set up, proceed to install Docker packages including Docker CE, Docker CLI, containerd.io, and optional plugins like docker-buildx-plugin and docker-compose-plugin.
+
+```shell
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+
+## Step 5: add permission to user:
+
+After setting up Docker on Ubuntu within the Windows Subsystem for Linux 2 (WSL 2) environment on Windows 11, granting permission to the current user is crucial for seamless Docker usage.
+
+```shell
+sudo usermod -aG docker $USER
+```
+
+## Step 6: Verify Installation:
+
+To ensure that Docker Engine has been successfully installed, run a simple test by executing the following command:
+
+```shell
+docker run hello-world
+```
+
+This command downloads a test image and runs it in a container. If successful, you'll see a confirmation message indicating that Docker Engine is up and running.
+
+## Step 7: Start Using Docker:
+
+Congratulations! You've successfully installed Docker Engine on your WSL Ubuntu system on Windows 11. Now, you're ready to leverage the power of Docker for containerization, deployment, and management of your applications.
+
+Dive deeper into Docker's vast ecosystem and explore its myriad features and capabilities to optimize your development workflow and infrastructure management.
+
+With this step-by-step guide, you're equipped to harness the full potential of Docker on WSL Ubuntu on Windows 11, empowering you to build, ship, and run applications seamlessly within containers. Happy containerizing!
