@@ -1,0 +1,122 @@
+---
+heroImage: >-
+  /src/assets/images/Navy Creative How Artificial Intelligence Youtube
+  Thumbnail.png
+category: Backend
+description: >-
+  "Learn to Install and Run GoLang on WSL 2 Ubuntu for Windows 11" Discover a
+  straightforward guide tailored for Windows 11 users, detailing step-by-step
+  instructions to install GoLang (Go) on Windows Subsystem for Linux (WSL) 2
+  Ubuntu. From downloading and setting up the environment to running a simple Go
+  program, this tutorial ensures a smooth installation process, enabling you to
+  dive into GoLang development seamlessly.
+pubDate: 2024-04-18T17:00:00.000Z
+tags:
+  - ubuntu
+  - wsl2
+  - golang
+title: 'Comprehensive Guide: Installing GoLang on WSL 2 Ubuntu for Windows 11'
+---
+
+## Introduction:
+
+In this tutorial, we will walk you through the step-by-step process of installing GoLang (Go) on Windows Subsystem for Linux (WSL) 2 Ubuntu, specifically tailored for Windows 11 users. Go is a powerful programming language known for its simplicity and efficiency, making it a popular choice for various development projects.
+
+## Prerequisites:
+
+1. Windows 11 installed on your system.
+2. Enabled WSL 2 with Ubuntu installed.
+3. Basic understanding of the command line interface.
+
+## Step 1: Remove Previous Go Installation (if any)
+
+Before proceeding with the installation, ensure to remove any existing Go installations to prevent conflicts.
+
+```shell
+sudo rm - rf / usr / local / go
+
+```
+
+## Step 2: Download and Extract the Latest GoLang Release
+
+Download the latest version of GoLang from the official website. Replace go1.22.2.linux-amd64.tar.gz with the latest version available.
+
+```shell
+wget https://golang.org/dl/go1.22.2.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.22.2.linux-amd64.tar.gz
+```
+
+This set of commands performs two main actions:
+
+1. `wget`: It's a command-line utility for downloading files from the internet. Here, it's being used to download the GoLang installation archive (`go1.22.2.linux-amd64.tar.gz`) from the official GoLang website ([https://golang.org/dl/](https://golang.org/dl/)).
+2. `sudo tar -C /usr/local -xzf go1.22.2.linux-amd64.tar.gz`: This command extracts the contents of the downloaded archive (`go1.22.2.linux-amd64.tar.gz`) into the `/usr/local` directory. Here's what each part does:
+   * `sudo`: It's used to execute the subsequent command with superuser (root) privileges, allowing the command to write to system directories like `/usr/local`.
+   * `tar`: It's a utility for archiving files. The `-xzf` options are used to extract (x) files from an archive, treating the input as a compressed archive (z), and specifying the archive file (f).
+   * `-C /usr/local`: This option tells tar to change to the specified directory (`/usr/local`) before performing any operations. This ensures that the extracted files are placed directly into `/usr/local`.
+   * `go1.22.2.linux-amd64.tar.gz`: This is the name of the archive file to be extracted.
+
+Overall, these commands download the GoLang installation archive and extract its contents into the /usr/local directory, effectively installing GoLang on the system.
+
+## Step 3: Update PATH Environment Variable
+
+To access Go executable from anywhere in the terminal, update the PATH environment variable by appending `/usr/local/go/bin` to it.
+
+```shell
+echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.profile
+source ~/.profile
+```
+
+These commands modify the `\~/.profile` file to add the Go executable directory (`/usr/local/go/bin`) to the system's PATH environment variable, allowing you to run Go commands from any directory without specifying the full path. Here's what each command does:
+
+1. `echo 'export PATH=$PATH:/usr/local/go/bin' >> \~/.profile`: This command appends the specified text (`export PATH=$PATH:/usr/local/go/bin`) to the end of the `\~/.profile` file. The export keyword makes the variable (PATH) available to subprocesses of the shell. This line adds `/usr/local/go/bin` to the existing PATH variable, separated by a colon (:).
+2. `source \~/.profile`: This command reloads the `\~/.profile` file, applying the changes made to it immediately to the current shell session. After running this command, the updated PATH variable will be available for use without needing to log out and log back in.
+
+These commands ensure that the Go executable directory is added to the PATH so that you can execute Go commands conveniently from any directory in your terminal session.
+
+## Step 4: Verify Go Installation
+
+Ensure that Go is installed correctly by checking its version.
+
+```go
+go version
+```
+
+If installed correctly, this command will display the installed version of Go.
+
+## Step 5: Configure Go Workspace (Optional)
+
+Create a directory to serve as your Go workspace where you'll store your Go code and projects.
+
+```shell
+mkdir -p ~/go/src
+echo 'export GOPATH=$HOME/go' >> ~/.profile
+echo 'export PATH=$PATH:$GOPATH/bin' >> ~/.profile
+source ~/.profile
+
+```
+
+These commands are aimed at setting up the Go workspace and updating the PATH variable accordingly. Here's what each command does:
+
+1. `mkdir -p \~/go/src`: This command creates a directory structure for your Go workspace. The `-p` option ensures that intermediate directories are created if they don't exist already. In this case, it creates the src directory inside `\~/go`, which is where your Go source code files will reside.
+2. `echo 'export GOPATH=$HOME/go' >> \~/.profile`: This command appends the export statement export `GOPATH=$HOME/go` to your \`\~/.profile file`. This sets the GOPATH environment variable to point to your Go workspace directory (`\~/go\`). The GOPATH is used by Go to locate your source code, dependencies, and compiled binaries.
+3. `echo 'export PATH=$PATH:$GOPATH/bin' >> \~/.profile`: This command appends the export statement export `PATH=$PATH:$GOPATH/bin` to your `\~/.profile` file. It adds the bin directory of your Go workspace (`$GOPATH/bin`) to the system's PATH environment variable. This ensures that any executables installed via go install will be accessible from the command line.
+4. `source \~/.profile`: This command reloads the `\~/.profile` file to apply the changes immediately in the current shell session.
+
+These commands set up your Go workspace and ensure that your Go executables are accessible from the command line. After executing these commands, you'll be ready to start working with Go on your system.
+
+## Step 6: Test Go Installation
+
+To confirm everything is set up correctly, create a simple Go program and run it.
+
+```shell
+mkdir -p ~/go/src/hello
+echo 'package main\nimport "fmt"\nfunc main() {\n\tfmt.Println("Hello, Go!")\n}' > ~/go/src/hello/hello.go
+go run ~/go/src/hello/hello.go
+
+```
+
+If you see "Hello, Go!" printed in the terminal, congratulations! You have successfully installed and tested Go on WSL 2 Ubuntu for Windows 11.
+
+## Conclusion:
+
+In this tutorial, you learned how to install GoLang on WSL 2 Ubuntu specifically for Windows 11 users. With Go installed, you're now ready to embark on your journey of building powerful and efficient applications using this versatile programming language. Happy coding!
