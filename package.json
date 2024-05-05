@@ -22,6 +22,7 @@
 	"scripts": {
 		"dev": "npx tinacms dev -c \"astro dev\"",
 		"start": "astro dev",
+		"prebuild": "node scripts/replaceAssetPaths.js",
 		"build": "astro build",
 		"sync": "astro sync",
 		"preview": "astro preview",

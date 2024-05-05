@@ -10,12 +10,12 @@ const posts = await getPosts(MAX_POSTS)
 ---
 
 <BaseLayout title='Home'>
-	<TitlePage title='Nozami' />
+	<TitlePage title='ProTel' />
 	<ListCategories />
 
 	<div>
-		<h2 class='text-lg font-medium tracking-wide text-end'>Latest Posts</h2>
-		<ListPosts FirstBig={true} posts={posts} />
+		<h2 class='text-lg font-medium tracking-wide text-end'></h2>
+		<ListPosts  posts={posts} />
 	</div>
 </BaseLayout>
 

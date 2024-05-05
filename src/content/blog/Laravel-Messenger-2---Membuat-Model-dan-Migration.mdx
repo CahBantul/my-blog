@@ -1,0 +1,79 @@
+---
+heroImage: ../../..../../../src/assets/images/Screenshot_12.png
+category: Fullstack
+description: Dalam tutorial ini, Anda akan mempelajari langkah-langkah membuat model untuk
+  entitas pesan dan mengonfigurasi migration untuk membuat tabel database yang
+  sesuai. Dengan model dan migration yang tepat, Anda akan dapat dengan mudah
+  mengelola dan berinteraksi dengan data pesan dalam aplikasi Laravel Anda.
+pubDate: 2024-05-01T17:00:00.000Z
+tags:
+  - laravel
+title: 'Laravel Messenger #2 - Membuat Model dan Migration'
+---
+
+Selamat datang kembali ke seri tutorial Laravel Messenger! Pada bagian sebelumnya, kita telah membuat struktur dasar proyek kita dan mengatur database. Sekarang, kita akan melangkah lebih jauh dengan membuat model dan migration untuk entitas pesan.
+
+## Langkah 1: Membuat Model dan Migration untuk Pesan
+
+Pertama, mari buat model dan migration untuk pesan kita. Di dalam Laravel, model adalah representasi dari tabel database kita. Mereka memungkinkan kita untuk dengan mudah berinteraksi dengan data di dalam tabel tersebut.
+
+Untuk membuat model dan migration, jalankan perintah artisan berikut di terminal:
+
+```shell
+php artisan make:model Message -m
+```
+
+![](../../..../../../src/assets/images/Screenshot_11.png)Perintah tersebut akan membuat 2 file yaitu model dan migration.
+
+## Langkah 2: Menambahkan Field Pada File Migration
+
+Selanjutnya edit file migration pada project saya bernama 2024\_05\_03\_172433\_create\_messages\_table.php menjadi seperti di bawah ini
+
+```php
+public function up(): void {
+  Schema:: create('messages', function (Blueprint $table) {
+    $table -> id();
+    $table -> foreignId('sender_id') -> constrained('users') -> onDelete('cascade');
+    $table -> foreignId('receiver_id') -> constrained('users') -> onDelete('cascade');
+    $table -> foreignId('reply_id') -> nullable() -> constrained('chats') -> onDelete('cascade');
+    $table -> text('content');
+    $table -> timestamp('seen_at') -> nullable();
+    $table -> timestamp('deleted_at') -> nullable();
+    $table -> timestamps();
+  });
+}
+```
+
+## Langkah 3: Menambahkan Relasi dan Mass Assignment Pada Model Message
+
+Buka file model Message.php dan tentukan properti untuk Mass Assignment dan relasi yang diperlukan.
+
+```php
+class Message extends Model {
+    use HasFactory;
+
+  protected $fillable = ['sender_id', 'receiver_id', 'content', 'reply_id', 'seen_at', 'deleted_at'];
+
+  public function sender() {
+    return $this -> belongsTo(User:: class, 'sender_id');
+  }
+
+  public function receiver() {
+    return $this -> belongsTo(User:: class, 'receiver_id');
+  }
+}
+```
+
+## Langkah 4: Menjalankan Migrate
+
+Langkah selanjutnya kita jalankan proses migrate database. Pada tutorial inis aya menggunakan database sqlite, jika anda ingin menggunakan mysql atau postgre tinggal diganti dibagian .env saja. Untuk menjalankan proses migrate cukun jalankah perintah
+
+```php
+php artisan migrate
+```
+
+## Kesimpulan
+
+Dalam tutorial ini, kita telah belajar cara membuat model dan migration untuk entitas pesan dalam aplikasi Laravel Messenger kita. Sekarang, kita memiliki fondasi yang kuat untuk terus membangun fitur-fitur baru pada aplikasi kita.
+
+Pada tutorial berikutnya, kita akan melihat cara menambahkan fungsionalitas untuk menampilkan pesan kepada pengguna. Jadi, tetaplah bersama kami!

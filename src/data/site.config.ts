@@ -9,8 +9,8 @@ interface SiteConfig {
 }
 
 export const siteConfig: SiteConfig = {
-	author: 'Nozami', // Site author
-	title: 'Nozami', // Site title.
+	author: 'ProTel', // Site author
+	title: 'ProTel', // Site title.
 	description: 'Unlock programming expertise with our concise, insightful blog posts.', // Description to display in the meta tags
 	lang: 'en-GB',
 	ogLocale: 'en_GB',
