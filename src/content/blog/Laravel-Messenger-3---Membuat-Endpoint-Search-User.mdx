@@ -35,10 +35,10 @@ Maka sekarang akan terbuat file api.php pada folder routes. dan jangan lupa untu
 Untuk logic pencarian User kita masukkan pada User Controller, pertama kita buat dulu User controllernya dengan perintah
 
 ```shell
-php artisan make:controller UserController
+php artisan make:controller UserController --test
 ```
 
-Perintah ini akan membuat file /app/Http/Controllers/UserController.php.Selanjutnya, Anda perlu membuat metode search di dalam UserController untuk menangani permintaan pencarian pengguna. Dalam metode ini, Anda akan menulis logika untuk melakukan pencarian pengguna berdasarkan kriteria yang diberikan.
+Perintah ini akan membuat file `app\Http\Controllers\UserController.php `dan `tests\Feature\Http\Controllers\UserControllerTest.php`.Selanjutnya, Anda perlu membuat metode search di dalam UserController untuk menangani permintaan pencarian pengguna. Dalam metode ini, Anda akan menulis logika untuk melakukan pencarian pengguna berdasarkan kriteria yang diberikan.
 
 ```php
 <?php
@@ -83,15 +83,38 @@ Route::get('/user', function (Request $request) {
 
 Rute ini akan mengarahkan permintaan GET ke endpoint /users/search ke dalam metode search di dalam UserController.
 
-## Langkah 4: Menggunakan Endpoint Pencarian
+## Langkah 4: Membuat Unit Test
 
-Sekarang, Anda dapat menggunakan endpoint pencarian yang telah Anda buat dalam aplikasi Anda. Ini bisa dilakukan dengan mengirimkan permintaan GET ke /users/search dengan parameter query yang berisi kata kunci pencarian.
+Sekarang edit file `tests\Feature\Http\Controllers\UserControllerTest.php` menjadi seperti berikut.
 
-```shell
-curl http://laravel-messenger.test/api/users/search?query=john
+```php
+<?php
+
+use App\Models\User;
+use Laravel\Pest\Factories\TestCase;
+
+it('can search users', function () {
+    $user1 = User::factory()->create(['name' => 'John Doe']);
+
+    $response = $this->getJson('/api/users/search?query=John');
+    $response->assertJsonCount(1, 'users')
+        ->assertJson(['users' => [['name' => $user1->name]]]);
+});
+
+it('returns empty array when no users found', function () {
+    $response = $this->getJson('/api/users/search?query=Nonexistent');
+
+    $response->assertJsonCount(0, 'users')
+        ->assertJson(['users' => []]);
+});
 ```
 
-Aplikasi Anda akan mengembalikan daftar pengguna yang nama mereka cocok dengan kriteria pencarian 'john'.
+kemudian jalankan unit test dengan cara
+
+```shell
+# windows
+php artisan test tests/Feature/Http/Controllers/UserControllerTest.php
+```
 
 ## Kesimpulan
 
