@@ -31,17 +31,18 @@ php artisan make:model Message -m
 Selanjutnya edit file migration pada project saya bernama 2024\_05\_03\_172433\_create\_messages\_table.php menjadi seperti di bawah ini
 
 ```php
-public function up(): void {
-  Schema:: create('messages', function (Blueprint $table) {
-    $table -> id();
-    $table -> foreignId('sender_id') -> constrained('users') -> onDelete('cascade');
-    $table -> foreignId('receiver_id') -> constrained('users') -> onDelete('cascade');
-    $table -> foreignId('reply_id') -> nullable() -> constrained('chats') -> onDelete('cascade');
-    $table -> text('content');
-    $table -> timestamp('seen_at') -> nullable();
-    $table -> timestamp('deleted_at') -> nullable();
-    $table -> timestamps();
-  });
+public function up(): void
+{
+    Schema::create('messages', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('sender_id')->constrained('users')->cascadeOnDelete();
+        $table->foreignId('receiver_id')->constrained('users')->cascadeOnDelete();
+        $table->foreignId('reply_id')->nullable(true)->constrained('messages')->cascadeOnDelete();
+        $table->text('content');
+        $table->timestamp('deleted_at')->nullable(true);
+        $table->timestamp('seen_at')->nullable(true);
+        $table->timestamps();
+    });
 }
 ```
 
@@ -50,18 +51,31 @@ public function up(): void {
 Buka file model Message.php dan tentukan properti untuk Mass Assignment dan relasi yang diperlukan.
 
 ```php
-class Message extends Model {
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Message extends Model
+{
     use HasFactory;
 
-  protected $fillable = ['sender_id', 'receiver_id', 'content', 'reply_id', 'seen_at', 'deleted_at'];
+    protected $fillable = [
+        "sender_id", "receiver_id", "content"
+    ];
 
-  public function sender() {
-    return $this -> belongsTo(User:: class, 'sender_id');
-  }
+    public function sender(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'sender_id', 'id');
+    }
 
-  public function receiver() {
-    return $this -> belongsTo(User:: class, 'receiver_id');
-  }
+    public function receiver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'receiver_id', 'id');
+    }
 }
 ```
 
