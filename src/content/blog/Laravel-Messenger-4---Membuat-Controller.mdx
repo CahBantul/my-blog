@@ -1,0 +1,115 @@
+---
+heroImage: /src/assets/images/a.png
+category: Fullstack
+description: ' Dalam artikel ini, kita membahas langkah-langkah penting dalam pembuatan MessageController untuk aplikasi Laravel Messenger. Dari pembuatan hingga pengujian, kami memberikan panduan singkat untuk memastikan bahwa Controller Anda berfungsi dengan baik dalam mengelola operasi pesan. Dengan artikel ini, Anda akan memahami pentingnya Controller dalam pengembangan aplikasi Laravel dan bagaimana mereka memengaruhi pengalaman pengguna.'
+pubDate: 2024-05-06T17:00:00.000Z
+tags:
+  - laravel
+title: 'Laravel Messenger #4 - Membuat Controller'
+---
+
+Dalam perjalanan pengembangan aplikasi Laravel Messenger, langkah berikutnya yang krusial adalah membuat Controller yang akan mengelola logika terkait pesan. Dalam tutorial ini, kita akan melangkah lebih jauh dengan membuat MessageController, yang akan mengurus semua operasi yang berkaitan dengan pesan dalam aplikasi.
+
+## Langkah 1: Membuat MessageController
+
+Untuk membuat MessageController, Anda dapat menggunakan perintah artisan Laravel:
+
+```php
+php artisan make:controller MessageController --test
+```
+
+Ini akan membuat file MessageController.php di dalam direktori app/Http/Controllers dan MessageControllerTest.php di dalam directory tests/Feature/Http/Controllers.
+
+## Langkah 2: Menampilkan Halaman Chat
+
+Selanjutnya kita akan membuat method index pada MessageController.php untuk merender halaman Chat/Index.jsx
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\User;
+use Illuminate\Http\Request;
+use Inertia\Response;
+
+class MessageController extends Controller
+{
+    public function index() : Response
+    {
+        return inertia('Chat/Index', [
+            "users" => User::query()->get()
+        ]);
+    }
+}
+```
+
+## Langkah 3: Menambahkan Endpoint
+
+selanjutnya menambahkan endpoint pada file web.php pada directory routes/web.php.
+
+```php
+<?php
+
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\ProfileController;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+
+Route::get('/', function () {
+    return Inertia::render('Welcome', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+        'laravelVersion' => Application::VERSION,
+        'phpVersion' => PHP_VERSION,
+    ]);
+});
+
+Route::get('/dashboard', function () {
+    return Inertia::render('Dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/chats', [MessageController::class, 'index'])->name('chat.index');
+});
+
+require __DIR__.'/auth.php';
+
+```
+
+## Langkah 4: Membuat Unit Test
+
+Penting untuk menguji setiap metode dalam Controller Anda untuk memastikan bahwa mereka berfungsi sesuai yang diharapkan. Dengan menulis pengujian unit, Anda dapat memverifikasi bahwa setiap fungsi berjalan dengan benar dan menangani berbagai skenario dengan baik. Selanjutnya kita buka file MessageControllerTest.php yang terdapat pada directory tests/Feature/Http/Controllers
+
+```php
+<?php
+
+use App\Models\User;
+
+test('Chat Index page can be rendered', function () {
+    $user = User::factory()->create();
+
+    $response = $this
+        ->actingAs($user)
+        ->get('/chats');
+
+    $response->assertOk();
+});
+
+test('Unauthorized User can not view chat page', function () {
+    $response = $this
+        ->get('/chats');
+
+    $response->assertRedirect(route('login'));
+});
+
+```
+
+## Kesimpulan
+
+Dalam tutorial ini, kita telah membahas pentingnya Controller dalam pengembangan aplikasi Laravel dan langkah-langkah untuk membuat MessageController dalam konteks aplikasi Laravel Messenger kita. Dengan Controller yang efisien dan terstruktur dengan baik, kita dapat mengelola logika bisnis aplikasi kita dengan lebih baik dan memberikan pengalaman pengguna yang mulus. Tetaplah bersama kami untuk langkah-langkah selanjutnya dalam pengembangan aplikasi Laravel Messenger yang menarik!
