@@ -9,7 +9,7 @@ description: >-
 pubDate: 2024-05-15T17:00:00.000Z
 tags:
   - laravel
-title: 'Laravel Messenger #6 - Membuat Endpoint Search User'
+title: 'Laravel Messenger #7 - Membuat Endpoint Search User'
 ---
 
 Dalam pengembangan aplikasi pesan, kemampuan untuk mencari pengguna menjadi krusial untuk memfasilitasi interaksi antar pengguna. Dengan menggunakan Laravel, Anda dapat dengan mudah membuat endpoint untuk pencarian pengguna. Dalam tutorial ini, kita akan melangkah melalui proses pembuatan endpoint tersebut.
@@ -23,7 +23,7 @@ Dalam ekosistem aplikasi pesan, pencarian pengguna memainkan peran penting dalam
 Karena secara default laravel 11 tidak mengaktifkan route untuk api, maka langkah pertama adalah mengaktifkan route untuk api dengan cara
 
 ```shell
-php artisan api:install
+php artisan install:api
 ```
 
 Maka sekarang akan terbuat file api.php pada folder routes. dan jangan lupa untuk menambahkan trait HasApiToken pada model User.
@@ -91,29 +91,40 @@ Sekarang edit file `tests\Feature\Http\Controllers\UserControllerTest.php` menja
 <?php
 
 use App\Models\User;
+use Database\Seeders\DatabaseSeeder;
 use Laravel\Pest\Factories\TestCase;
 
 it('can search users', function () {
+    $this->seed(DatabaseSeeder::class);
     $user1 = User::factory()->create(['name' => 'John Doe']);
 
-    $response = $this->getJson('/api/users/search?query=John');
+    $response = $this
+                ->actingAs($user1)
+                ->getJson('/api/users/search?query=test');
+                info($response->json());
     $response->assertJsonCount(1, 'users')
-        ->assertJson(['users' => [['name' => $user1->name]]]);
+        ->assertJson(['users' => [['name' => 'Test User']]]);
+    $response->assertStatus(200);
 });
 
-it('returns empty array when no users found', function () {
-    $response = $this->getJson('/api/users/search?query=Nonexistent');
+it('return empty array when no user found', function () {
+    $this->seed(DatabaseSeeder::class);
+    $user1 = User::factory()->create(['name' => 'John Doe']);
 
+    $response = $this
+                ->actingAs($user1)
+                ->getJson('/api/users/search?query=tidak ada');
     $response->assertJsonCount(0, 'users')
         ->assertJson(['users' => []]);
+    $response->assertStatus(200);
 });
+
 ```
 
 kemudian jalankan unit test dengan cara
 
 ```shell
-# windows
-php artisan test tests/Feature/Http/Controllers/UserControllerTest.php
+php artisan test --filter UserControllerTest
 ```
 
 ## Kesimpulan
