@@ -1,0 +1,148 @@
+---
+heroImage: /src/assets/images/Laravel Messenger.png
+category: Fullstack
+description: >-
+  Tutorial ini membimbing Anda melalui langkah-langkah instalasi Laravel Reverb
+  ke dalam proyek Laravel Messenger Anda, mengimplementasikan fitur pesan
+  real-time dengan mudah. Dengan langkah-langkah praktis, Anda dapat memperluas
+  fungsionalitas aplikasi Anda dengan fitur pesan real-time yang dinamis.
+pubDate: 2024-05-10T17:00:00.000Z
+tags:
+  - laravel
+title: 'Laravel Messenger #6 - Install Laravel Reverb'
+---
+
+Selamat datang kembali di seri tutorial Laravel Messenger! Pada tutorial ini, kita akan melangkah lebih jauh dengan menginstal Laravel Reverb, sebuah paket yang akan membantu kita mengimplementasikan fitur pesan real-time ke dalam aplikasi Laravel Messenger kita. Mari kita mulai!
+
+## Langkah 1: Instal Laravel Reverb
+
+Untuk mengintall Laravel reverb cukup mudah tinggal jalan perintah di bawah ini
+
+```shell
+php artisan install:broadcasting
+```
+
+![](/src/assets/images/Screenshot_15.png)
+
+Setelah terinstall pada file bootstrap\app.php akan ditambahkan route channels dan pada config akan ditambahkan file broadcasing.php dan reverb.php. Selain itu pada directory resources\js akan ditambahkan file echo.js dan diimport pada file bootstrap.js
+
+## Langkah 2: Membuat Event
+
+Langkah selanjutnya kita buat event untuk menghandle ketika pesan dikirim. Untuk membuat event tinggal jalankan perintah
+
+```php
+php artisan make:event MessageSent
+```
+
+perintah ini akan mengenerate file app\Events\MessageSent.php selanjuta kita edit file tersebut menjadi seperti di bawah ini
+
+```php
+<?php
+
+namespace App\Events;
+
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class MessageSent
+{
+    use Dispatchable, InteractsWithSockets, SerializesModels;
+
+    /**
+     * Create a new event instance.
+     */
+    public function __construct(public $message)
+    {
+        //
+    }
+
+    /**
+     * Get the channels the event should broadcast on.
+     *
+     * @return array<int, \Illuminate\Broadcasting\Channel>
+     */
+    public function broadcastOn(): array
+    {
+        return [
+            new Channel('message-sent-channel'),
+        ];
+    }
+}
+
+```
+
+## Langkah 3: Update Method Store Pada MessageController
+
+Selanjutnya kita update method store dengan menambahkan function broadcast yang memanggil MessageSent event.
+
+```php
+ public function store(User $user, Request $request)
+    {
+        /** @var User $authUser */
+        $authUser = auth()->user();
+        $authUser->sendMessage()->create([
+            "content" => $request->message,
+            "receiver_id" => $user->id,
+        ]);
+
+        broadcast(new MessageSent($request->message))->toOthers();
+
+        return back();
+    }
+```
+
+## Langkah 4: Menambahkan Echo pada App.jsx
+
+Selanjutnya kita tinggal memanggil echo pada resources\js\Layouts\App.jsx. Echo ini akan kita bungkus pada useEffect dan juga menggunakan debounce agar ada interval di hit nya. Berikut ini code yang ditambahkan di sebelum return
+
+```javascript
+useEffect(() => {
+  const debouncedReload = debounce(() => {
+    router.reload({
+      preserveScoll: true,
+      only: ["messages", "users"],
+    });
+  }, 300);
+
+  Echo.channel("message-sent-channel").listen("MessageSent", () =>
+    debouncedReload()
+  );
+
+  return () => {
+    Echo.channel("message-sent-channel").stopListening("MessageSent");
+  };
+}, []);
+```
+
+## Langkah 5: Update Submit Handler pada ChatInputMessage
+
+Selanjutnya kita update submit handler pada component ChatInputMessage dengan menambahkan headers yang berisi socketid.
+
+```javascript
+const submitHandler = (e) => {
+  e.preventDefault();
+  post(route("chat.store", chatWithUser.id), {
+    headers: {
+      "X-Socket-Id": Echo.socketId(),
+    },
+    onStart: () => {
+      reset();
+      e.target.style.height = "auto";
+      props.setReply(null);
+      props.setIsTyping(false);
+    },
+    preserveScroll: true,
+  });
+};
+```
+
+## Kesimpulan
+
+Sekarang Anda telah berhasil menginstal Laravel Reverb ke dalam proyek Laravel Messenger Anda. Ini membuka pintu untuk mengimplementasikan fitur pesan real-time dengan mudah. Pastikan untuk membaca dokumentasi resmi [Laravel Reverb](https://laravel.com/docs/11.x/reverb "laravel reverb") untuk mempelajari lebih lanjut tentang cara menggunakan semua fiturnya.
+
+Dengan langkah-langkah ini, proyek Laravel Messenger Anda semakin berkembang dan semakin mendekati visi Anda. Tetap disini untuk tutorial selanjutnya di mana kita akan melangkah lebih jauh dengan mengimplementasikan fitur-fitur tambahan!

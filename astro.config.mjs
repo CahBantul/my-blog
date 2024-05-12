@@ -3,6 +3,7 @@ import mdx from '@astrojs/mdx'
 import sitemap from '@astrojs/sitemap'
 import tailwind from '@astrojs/tailwind'
 import { remarkReadingTime } from './src/utils/readTime.ts'
+import { externalLink } from 'src/externalLink.ts'
 
 // https://astro.build/config
 export default defineConfig({
@@ -13,7 +14,8 @@ export default defineConfig({
 		shikiConfig: {
 			theme: 'material-theme-palenight',
 			wrap: true
-		}
+		},
+		rehypePlugins: [[externalLink, { domain: "https://programmertelo.vercel.app" }]],
 	},
 	integrations: [
 		mdx({
