@@ -504,7 +504,6 @@ class MessageController extends Controller
 {
     public function index(): Response
     {
-        dd($this->getUser()->toArray());
         return inertia('Chat/Index', [
             "users" => $this->getUser()
         ]);
