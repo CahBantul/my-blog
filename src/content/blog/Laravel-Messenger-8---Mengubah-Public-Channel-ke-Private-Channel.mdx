@@ -1,0 +1,310 @@
+---
+heroImage: /src/assets/images/Laravel Messenger (2).png
+category: Fullstack
+description: >-
+  Tutorial ini mengajarkan cara mengubah public channel menjadi private channel
+  dalam aplikasi Laravel Messenger untuk meningkatkan keamanan dan privasi
+  pesan. Ikuti langkah-langkah praktis untuk mengonfigurasi broadcasting,
+  membuat private channel, menyesuaikan event broadcasting, dan memperbarui
+  client-side.
+pubDate: 2024-05-25T17:00:00.000Z
+tags:
+  - laravel
+title: 'Laravel Messenger #8 - Mengubah Public Channel ke Private Channel'
+---
+
+Selamat datang kembali di seri tutorial Laravel Messenger! Pada tutorial ini, kita akan belajar bagaimana mengubah public channel menjadi private channel untuk meningkatkan keamanan dan privasi dalam aplikasi pesan instan kita. Ikuti langkah-langkah di bawah ini untuk melakukan perubahan ini.
+
+## Langkah 1: Sesuaikan Event Broadcasting
+
+Pastikan event Anda menggunakan private channel. Ubah file app\Events\MessageSent.php, ubah channel broadcasting dari public ke private:
+
+```php
+<?php
+
+namespace App\Events;
+
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class MessageSent implements ShouldBroadcastNow
+{
+    use Dispatchable, InteractsWithSockets, SerializesModels;
+    public $message;
+    /**
+     * Create a new event instance.
+     */
+    public function __construct($message)
+    {
+        $this->message = $message;
+    }
+
+    /**
+     * Get the channels the event should broadcast on.
+     *
+     * @return array<int, \Illuminate\Broadcasting\Channel>
+     */
+    public function broadcastOn(): array
+    {
+        return [
+            new PrivateChannel("message-sent-channel.". $this->message->receiver->id),
+        ];
+    }
+}
+```
+
+## Langkah 2: Buat Private Channel Route
+
+Ubah public channel menjadi private channel di file routes\channels.php. Misalnya, jika Anda memiliki public channel message-sent-channel, ubah menjadi private channel seperti berikut:
+
+```php
+<?php
+
+use Illuminate\Support\Facades\Broadcast;
+
+Broadcast::channel('message-sent-channel.{id}', function ($user, $id) {
+    return (int) $user->id === (int) $id;
+});
+```
+
+Di sini, kita menggunakan model binding untuk memverifikasi bahwa pengguna yang berlangganan ke channel adalah pengguna yang sah.
+
+## Langkah 3: Perbarui Client-Side
+
+Di sisi klien, pastikan Anda menggunakan private channel untuk mendengarkan event. Pada file resources\js\Layouts\App.jsx, ubah channel yang didengarkan menjadi private:
+
+```php
+//resources\js\Layouts\App.jsx
+
+import React, { useEffect } from "react";
+import MineProfileChat from "@/Components/MineProfileChat.jsx";
+import SearchChatBar from "@/Components/SearchChatBar.jsx";
+import ChatListUser from "@/Components/ChatListUser.jsx";
+import { usePage } from "@inertiajs/react";
+import { router } from "@inertiajs/react";
+
+export default function ({ children }) {
+    const { auth } = usePage().props;
+
+    useEffect(() => {
+        Echo.private("message-sent-channel." + auth.user.id).listen("MessageSent", (e) => {
+            router.reload({
+                preserveScroll : true,
+                only: ["messages", "users"]
+            })
+        });
+    }, []);
+
+    const renderSidebarScreen = () => {
+        const currentPath = route().current();
+        let className =
+            "px-5 py-2 pb-5 lg:w-1/3 lg:border-r lg:border-gray-700 ";
+
+        if (currentPath === "chat.index") className += "flex flex-col w-full";
+        else className += "hidden flex-col lg:flex";
+
+        return className;
+    };
+
+    return (
+        <>
+            <div className="relative min-h-screen bg-gray-900 bg-dots-lighter selection:bg-red-500 selection:text-white">
+                <div className="px-6 mx-auto max-w-screen-2xl xl:px-0">
+                    <div className="h-screen py-6">
+                        <div className="flex h-full overflow-hidden border border-gray-700 rounded-lg shadow">
+                            <div className={renderSidebarScreen()}>
+                                <MineProfileChat auth={auth} />
+                                <SearchChatBar />
+                                <ChatListUser />
+                            </div>
+
+                            {children}
+                        </div>
+                    </div>
+                </div>
+
+                <style>{`
+                .bg-dots-darker {
+                    background-image: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.22676 0C1.91374 0 2.45351 0.539773 2.45351 1.22676C2.45351 1.91374 1.91374 2.45351 1.22676 2.45351C0.539773 2.45351 0 1.91374 0 1.22676C0 0.539773 0.539773 0 1.22676 0Z' fill='rgba(0,0,0,0.07)'/%3E%3C/svg%3E");
+                }
+                @media (prefers-color-scheme: dark) {
+                    .bg-dots-lighter {
+                        background-image: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.22676 0C1.91374 0 2.45351 0.539773 2.45351 1.22676C2.45351 1.91374 1.91374 2.45351 1.22676 2.45351C0.539773 2.45351 0 1.91374 0 1.22676C0 0.539773 0.539773 0 1.22676 0Z' fill='rgba(255,255,255,0.07)'/%3E%3C/svg%3E");
+                    }
+                }
+            `}</style>
+            </div>
+        </>
+    );
+}
+
+```
+
+## Langkah 4: Perbarui MessageController
+
+Karena pada MessageSent event kita menggunakan receiver id yang di dapat dari variabel message, maka ketika nge broadcast kita perlu me load receiver juga. Jadi mari kira update app\Http\Controllers\MessageController.php menjadi :
+
+```php
+   public function store(User $user, Request $request)
+    {
+        /** @var User $authUser */
+        $authUser = auth()->user();
+        $message = $authUser->sendMessage()->create([
+            "content" => $request->message,
+            "receiver_id" => $user->id,
+        ]);
+
+        broadcast(new MessageSent($message->load('receiver')))->toOthers();
+
+        return back();
+    }
+```
+
+## Langkah 5: Alter table User
+
+Agar lebih aman untuk identifiernya kita rubah dari id menjadi uuid, oleh karena itu kita lakukan alter table user degan menambahkan kolom uuid
+
+```shell
+php artisan make:migration "add uuid to users table"
+```
+
+Buka file migration yang baru dibuat di database/migrations/ dan tambahkan kode berikut:
+
+```php
+<?php
+
+use App\Models\User;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->uuid("uuid")->nullable(true)->unique();
+        });
+
+        // generate UUID for existing users table
+        User::query()
+            ->whereNull('uuid')
+            ->get()
+            ->each(function (User $user) {
+                info(str()->uuid());
+                $user->uuid = str()->uuid();
+                $user->save();
+            });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropUnique("users_uuid_unique");
+            $table->dropColumn('uuid');
+        });
+    }
+};
+```
+
+Jalankan perintah berikut untuk menjalankan migration:
+
+```shell
+php artisan migrate
+```
+
+## Langkah 6: Perbaruhi Model User
+
+Buka model User dan tambahkan uuid ke dalam $fillable:
+
+```php
+<?php
+
+namespace App\Models;
+
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+
+class User extends Authenticatable
+{
+    use HasFactory, Notifiable;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'uuid'
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $model->uuid = (string) str()->uuid();
+        });
+    }
+
+    public function sendMessage() : HasMany
+    {
+        return $this->hasMany(Message::class, 'sender_id', 'id');
+    }
+
+    public function receiveMessage() : HasMany
+    {
+        return $this->hasMany(Message::class, 'receiver_id', 'id');
+    }
+}
+
+```
+
+Setelah itu rubah id menjadi uuid pada file app\Events\MessageSent.php  dan resources\js\Layouts\App.jsx
+
+## Kesimpulan
+
+Dengan mengikuti langkah-langkah ini, Anda telah berhasil mengubah public channel menjadi private channel dalam aplikasi Laravel Messenger Anda dan menambahkan UUID sebagai identifier untuk meningkatkan keamanan. Ini meningkatkan privasi dan keamanan pesan yang dikirimkan dalam aplikasi. Pastikan untuk menguji perubahan ini untuk memastikan bahwa semua fungsi bekerja sebagaimana mestinya.
+
+Terus ikuti seri tutorial ini untuk belajar lebih banyak tentang pengembangan aplikasi Laravel Messenger yang canggih dan aman.
