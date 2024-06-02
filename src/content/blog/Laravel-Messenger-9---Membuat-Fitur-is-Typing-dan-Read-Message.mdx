@@ -1,0 +1,65 @@
+---
+heroImage: /src/assets/images/Laravel Messenger (2).png
+category: Fullstack
+description: >-
+  Dalam tutorial ini, kita akan menambahkan fitur "is Typing" dan "Read Message"
+  ke aplikasi Laravel Messenger. Anda akan belajar cara mengkonfigurasi event
+  broadcasting, membuat event "UserTyping" dan "MessageRead", mengirim event
+  dari controller, dan mendengarkan event di sisi klien menggunakan Laravel
+  Echo. Fitur ini akan meningkatkan interaksi pengguna dengan menunjukkan saat
+  lawan bicara sedang mengetik dan menampilkan tanda pesan telah dibaca.
+pubDate: 2024-06-01T17:00:00.000Z
+draft: false
+tags:
+  - laravel
+title: 'Laravel Messenger #9 - Membuat Fitur "is Typing" dan "Read Message"'
+---
+
+Selamat datang kembali di seri tutorial Laravel Messenger! Pada tutorial ini, kita akan menambahkan dua fitur penting: "is Typing" dan "Read Message". Fitur "is Typing" memberi tahu pengguna saat lawan bicara sedang mengetik, sementara fitur "Read Message" menunjukkan bahwa pesan telah dibaca. Ikuti langkah-langkah di bawah ini untuk mengimplementasikan fitur-fitur ini.
+
+## Langkah 1: Update seen\_at Pada Table messages
+
+Pertama, kita akan memperbarui method show pada MessageController agar menambahkan nilai seen\_at pada pesan yang seen\_at-nya masih null. Tambahkan 2 baris kode berikut ini sebelum return pada methos show
+
+```php
+$chats = $user->sendMessage()->where('receiver_id', auth()->id())->whereNull('seen_at')->get();
+$chats->each->update(['seen_at' => now()]);
+```
+
+## Langkah 2: Tambahkan event Whisper Pada ChatInputMessage
+
+Sekarang, kita akan menambahkan event whisper pada input pesan untuk memberi tahu lawan bicara bahwa pengguna sedang mengetik. Langsung saja tambahkan code berikut pada resources\js\Components\ChatInputMessage.jsx
+
+```javascript
+const onTyping = () => {
+  setTimeout(() => {
+    Echo.private(`message-sent-channel.${chatWithUser.uuid}`).whisper("typing", {
+      name: chatWithUser.name,
+    });
+  }, 300);
+};
+```
+
+Fungsi onTyping ini akan mengirimkan whisper event "typing" ke channel private message-sent-channel yang diidentifikasi oleh UUID dari pengguna yang sedang diajak chat (chatWithUser.uuid). Ini memberi tahu pengguna lain bahwa lawan bicara sedang mengetik.
+
+## Langkah 3: Tambahkan Listen Whisper Pada Show Page
+
+Sekarang, kita akan mendengarkan event whisper di komponen chat untuk menampilkan indikator "is Typing". Langsung saja tambahkan code berikut ini pada resources\js\Pages\Chat\Show\.jsx
+
+```javascript
+Echo.private("message-sent-channel." + auth.user.uuid).listenForWhisper("typing", () => {
+  setIsTyping(true);
+
+  setTimeout(() => {
+    setIsTyping(false);
+  }, 2000);
+});
+```
+
+Kode ini mendengarkan whisper event "typing" di channel private message-sent-channel yang diidentifikasi oleh UUID dari pengguna yang sedang diajak chat (auth.user.uuid). Ketika event diterima, fungsi callback akan menampilkan indikator "is Typing" selama 2 detik sebelum menyembunyikannya lagi.
+
+## Kesimpulan
+
+Dengan mengikuti langkah-langkah ini, Anda telah berhasil mengimplementasikan fitur "is Typing" dan "Read Message" dalam aplikasi Laravel Messenger Anda. Fitur ini akan meningkatkan interaksi pengguna dengan memberi tahu mereka saat pesan sedang diketik atau telah dibaca. Pastikan untuk menguji semua perubahan untuk memastikan bahwa semua fungsi bekerja sebagaimana mestinya.
+
+Terus ikuti seri tutorial ini untuk mempelajari lebih lanjut tentang pengembangan aplikasi Laravel Messenger yang canggih dan interaktif!
