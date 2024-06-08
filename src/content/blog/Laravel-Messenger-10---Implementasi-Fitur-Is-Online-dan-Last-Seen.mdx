@@ -1,0 +1,479 @@
+---
+heroImage: /src/assets/images/Laravel Messenger.png
+category: Fullstack
+description: >-
+  Selamat datang kembali di seri tutorial Laravel Messenger! Pada tutorial ini,
+  kita akan menambahkan dua fitur penting: "Is Online" dan "Last Seen". Fitur
+  "Is Online" menunjukkan apakah pengguna saat ini sedang online, sementara
+  fitur "Last Seen" menampilkan waktu terakhir pengguna online. Ikuti
+  langkah-langkah dalam tutorial ini untuk memperbarui tabel pengguna, membuat
+  middleware, event, dan listener, serta menampilkan status online dan waktu
+  terakhir pengguna aktif di aplikasi Anda.
+pubDate: 2024-06-07T17:00:00.000Z
+tags:
+  - laravel
+title: 'Laravel Messenger #10 - Implementasi Fitur "Is Online" dan "Last Seen"'
+---
+
+Selamat datang kembali di seri tutorial Laravel Messenger! Pada tutorial ini, kita akan menambahkan dua fitur penting: "Is Online" dan "Last Seen". Fitur "Is Online" menunjukkan apakah pengguna saat ini sedang online, sementara fitur "Last Seen" menampilkan waktu terakhir pengguna online. Ikuti langkah-langkah dalam tutorial ini untuk memperbarui tabel pengguna, membuat middleware, event, dan listener, serta menampilkan status online dan waktu terakhir pengguna aktif di aplikasi Anda.
+
+## Langkah 1: Buat Kolom last\_seen di Tabel users
+
+Pertama, kita akan membuat kolom last\_seen di tabel users untuk menyimpan waktu terakhir pengguna online.
+
+* Buat migrasi baru untuk menambahkan kolom last\_seen:
+
+```shell
+php artisan make:migration add_last_seen_at_to_users_table
+```
+
+* Edit file migrasi yang baru dibuat di database/migrations/xxxx\_xx\_xx\_xxxxxx\_add\_last\_seen\_at\_to\_users\_table.php :
+
+```php
+public function up()
+{
+    Schema::table('users', function (Blueprint $table) {
+        $table->timestamp('last_seen_at')->nullable();
+    });
+}
+
+public function down()
+{
+    Schema::table('users', function (Blueprint $table) {
+        $table->dropColumn('last_seen_at');
+    });
+}
+```
+
+* Update Model User dengan menambahkan last\_seen\_at pada variable fillable dan cast menjadi datetime
+
+```php
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'last_seen_at'
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+            'last_seen_at' => 'datetime',
+        ];
+    }
+```
+
+* Jalankan migrasi untuk memperbarui tabel users:
+
+```shell
+php artisan migrate
+```
+
+## Langkah 2: Update Middleware untuk Menyimpan Waktu Terakhir Online
+
+Buat middleware untuk memperbarui kolom last\_seen setiap kali pengguna melakukan request.
+
+* Buat middleware baru:
+
+```shell
+php artisan make:middleware UpdateLastSeen
+```
+
+* Edit file middleware yang baru dibuat di app/Http/Middleware/UpdateLastSeen.php:
+
+```php
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
+use App\Events\UserOnline;
+use App\Events\UserOffline;
+
+class UpdateLastSeen
+{
+    public function handle($request, Closure $next)
+    {
+        /** @var User $authUser */
+        $authUser = auth()->user();
+        if (auth()->check()) {
+            $authUser->update([
+                'last_seen_at' => now(),
+            ]);
+        }
+
+        return $next($request);
+    }
+}
+
+```
+
+* Daftarkan middleware di bootstrap\app.php:
+
+```php
+<?php
+
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Foundation\Configuration\Middleware;
+
+return Application::configure(basePath: dirname(__DIR__))
+    ->withRouting(
+        web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php',
+        commands: __DIR__.'/../routes/console.php',
+        channels: __DIR__.'/../routes/channels.php',
+        health: '/up',
+    )
+    ->withMiddleware(function (Middleware $middleware) {
+        $middleware->web(append: [
+            \App\Http\Middleware\HandleInertiaRequests::class,
+            \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
+        ]);
+
+        //Middleware alises
+        $middleware->alias([
+            'user.last_seen_at' => \App\Http\Middleware\UpdateLastSeen::class,
+        ]);
+    })
+    ->withExceptions(function (Exceptions $exceptions) {
+        //
+    })->create();
+```
+
+* tambahkan middleware user.last\_seen\_at pada routes\web.php
+
+```php
+Route::middleware(['auth', 'user.last_seen_at'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/chats', [MessageController::class, 'index'])->name('chat.index');
+    Route::post('/chats/{user:uuid}', [MessageController::class, 'store'])->name('chat.store');
+    Route::get('/chats/{user:uuid}', [MessageController::class, 'show'])->name('chat.show');
+    Route::delete('/chats/{message}', [MessageController::class, 'destroy'])->name('chat.destroy');
+});
+```
+
+* edit method show pada MessageController.php
+
+```php
+public function show(User $user): Response
+{
+    $chats = $user->sendMessage()->where('receiver_id', auth()->user()->id)->whereNull('seen_at')->get();
+    $chats->each->update(['seen_at' => now()]);
+    $timestamp = $user->last_seen_at;
+    $lastSeenAt = $timestamp?->isToday() ? "Last seen today at {$timestamp?->format('H:i')}" : ($timestamp?->isYesterday()
+        ? "Last seen yesterday at {$timestamp?->format('H:i')}"
+        : "Last seen at {$timestamp?->format('d/m/Y H:i')}"
+    );
+
+    return inertia('Chat/Show', [
+        "chat_with" => [
+            'id' => $user->id,
+            'uuid' => $user->uuid,
+            'name' => $user->name,
+            'last_seen_at' => $lastSeenAt
+        ],
+        "messages" => Message::query()
+            ->where(fn ($q) => $q->where('sender_id', auth()->user()->id)->where('receiver_id', $user->id))
+            ->orWhere(fn ($q) => $q->where('sender_id', $user->id)->where('receiver_id', auth()->user()->id))
+            ->get()
+            ->groupBy(function ($message) {
+                return $message->created_at->isToday() ? "Today" : ($message->created_at->isYesterday() ? "Yesterday" : $message->created_at->format("F j, Y"));
+            })
+            ->map(function ($messages, $date) {
+                return [
+                    "messages" => $messages,
+                    "date" => $date
+                ];
+            })
+            ->values(),
+        "users" => $this->getUser()
+    ]);
+}
+```
+
+## Langkah 3: Mengatur Broadcast Channel
+
+* Edit file routes/channels.php untuk mengatur channel online-users:
+
+```php
+Broadcast::channel('online-users', function ($user) {
+    return [
+        'uuid' => $user->uuid
+    ];
+});
+
+```
+
+* edit resources\js\Layouts\App.jsx
+
+```javascript
+//resources\js\Layouts\App.jsx
+
+import React, { useEffect, useState } from "react";
+import MineProfileChat from "@/Components/MineProfileChat.jsx";
+import SearchChatBar from "@/Components/SearchChatBar.jsx";
+import ChatListUser from "@/Components/ChatListUser.jsx";
+import { usePage } from "@inertiajs/react";
+import { router } from "@inertiajs/react";
+
+export default function ({ children }) {
+  const { auth } = usePage().props;
+  const [onlineUsers, setOnlineUsers] = useState([]);
+
+  useEffect(() => {
+    Echo.private("message-sent-channel." + auth.user.uuid).listen(
+      "MessageSent",
+      (e) => {
+        router.reload({
+          preserveScroll: true,
+          only: ["messages", "users"],
+        });
+      }
+    );
+
+    Echo.join("online-users")
+      .here((users) => {
+        setOnlineUsers(users);
+      })
+      .joining((user) => {
+        setOnlineUsers((prev) => [...prev, user]);
+      })
+      .leaving((user) => {
+        setOnlineUsers((prev) => prev.filter((u) => u.uuid !== user.uuid));
+      });
+  }, []);
+
+  const renderSidebarScreen = () => {
+    const currentPath = route().current();
+    let className =
+      "px-5 py-2 pb-5 lg:w-1/3 lg:border-r lg:border-gray-700 ";
+
+    if (currentPath === "chat.index") className += "flex flex-col w-full";
+    else className += "hidden flex-col lg:flex";
+
+    return className;
+  };
+
+  return (
+    <>
+      <div className="relative min-h-screen bg-gray-900 bg-dots-lighter selection:bg-red-500 selection:text-white">
+        <div className="px-6 mx-auto max-w-screen-2xl xl:px-0">
+          <div className="h-screen py-6">
+            <div className="flex h-full overflow-hidden border border-gray-700 rounded-lg shadow">
+              <div className={renderSidebarScreen()}>
+                <MineProfileChat auth={auth} />
+                <SearchChatBar />
+                <ChatListUser />
+              </div>
+
+              {React.cloneElement(children, {
+                onlineUsers,
+                setOnlineUsers,
+              })}
+            </div>
+          </div>
+        </div>
+
+        <style>{`
+                .bg-dots-darker {
+                    background-image: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.22676 0C1.91374 0 2.45351 0.539773 2.45351 1.22676C2.45351 1.91374 1.91374 2.45351 1.22676 2.45351C0.539773 2.45351 0 1.91374 0 1.22676C0 0.539773 0.539773 0 1.22676 0Z' fill='rgba(0,0,0,0.07)'/%3E%3C/svg%3E");
+                }
+                @media (prefers-color-scheme: dark) {
+                    .bg-dots-lighter {
+                        background-image: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.22676 0C1.91374 0 2.45351 0.539773 2.45351 1.22676C2.45351 1.91374 1.91374 2.45351 1.22676 2.45351C0.539773 2.45351 0 1.91374 0 1.22676C0 0.539773 0.539773 0 1.22676 0Z' fill='rgba(255,255,255,0.07)'/%3E%3C/svg%3E");
+                    }
+                }
+            `}</style>
+      </div>
+    </>
+  );
+}
+
+```
+
+* edit juga resources\js\Pages\Chat\Show\.jsx
+
+```javascript
+import React, { Fragment, useEffect, useRef, useState } from "react";
+import App from "@/Layouts/App.jsx";
+import { Head, usePage } from "@inertiajs/react";
+import HeaderUserChatBox from "@/Components/HeaderUserChatBox.jsx";
+import ChatInputMessage from "@/Components/ChatInputMessage.jsx";
+import DateChatIndicator from "@/Components/DateChatIndicator.jsx";
+import LeftSideBoxChat from "@/Components/LeftSideBoxChat.jsx";
+import RightSideBoxChat from "@/Components/RightSideBoxChat.jsx";
+
+export default function Show({ onlineUsers }) {
+  const { auth, chat_with: chatWithUser, messages } = usePage().props;
+  const scrollRef = useRef(null);
+  const [reply, setReply] = useState(null);
+  const [isTyping, setIsTyping] = useState(false);
+
+  const replyHandleState = (message) => {
+    setReply(message);
+  };
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo(0, scrollRef.current?.scrollHeight);
+  }, [messages, reply]);
+
+  Echo.private(`message-sent-channel.${auth.user.uuid}`).listenForWhisper(
+    "typing",
+    () => {
+      setIsTyping(true);
+
+      setTimeout(() => {
+        setIsTyping(false);
+      }, 2000);
+    }
+  );
+
+  const renderMessage = (messages, auth) => {
+    return messages.map((date) => (
+      <Fragment key={date.date}>
+        <DateChatIndicator date={date.date} />
+        {date.messages.map((message, idx) => {
+          const isFirstMessage =
+            idx === 0 ||
+            message.sender_id !== date.messages[idx - 1].sender_id;
+          return (
+            <Fragment key={message.id}>
+              {message.sender_id === auth.user.id ? (
+                <RightSideBoxChat
+                  message={message}
+                  isFirstMessage={isFirstMessage}
+                  replyHandleState={replyHandleState}
+                />
+              ) : (
+                <LeftSideBoxChat
+                  message={message}
+                  isFirstMessage={isFirstMessage}
+                  replyHandleState={replyHandleState}
+                />
+              )}
+            </Fragment>
+          );
+        })}
+      </Fragment>
+    ));
+  };
+
+  return (
+    <>
+      <Head title="Chat " />
+
+      <div className="flex flex-col w-full lg:w-2/3">
+        <div className="px-6 py-5 border-b border-gray-700">
+          <div className="flex items-center justify-between">
+            <HeaderUserChatBox
+              user={chatWithUser}
+              isOnline={onlineUsers?.find(
+                (onlineUser) =>
+                  onlineUser.id === chatWithUser.id
+              )}
+              isTyping={isTyping}
+            />
+            <div className="pr-5">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="w-3.5 h-3.5 lg:w-5 lg:h-5 text-white"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className="flex-1 h-screen px-2 pb-5 overflow-y-scroll lg:px-8"
+          ref={scrollRef}
+        >
+          <div className="grid grid-cols-12">
+            {renderMessage(messages, auth)}
+          </div>
+        </div>
+
+        <div
+          className={`transform transition-transform ${reply ? "translate-y-0" : "translate-y-full"
+            } duration-150 ease-in-out`}
+        >
+          {reply && (
+            <div className="flex items-center py-2 border-t border-gray-700 px-9">
+              <div className="flex items-center justify-between w-full px-2 py-1.5 bg-gray-700/50 border-gray-600 border-l-4 rounded">
+                <div className="text-[10px] lg:text-xs">
+                  <div className="mb-1 text-purple-400">
+                    {reply.sender_id === auth.user.id
+                      ? "You"
+                      : chatWithUser.name}
+                  </div>
+                  <div
+                    className="overflow-hidden text-gray-300/80"
+                    style={{
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                    }}
+                  >
+                    <div className="whitespace-pre-wrap">
+                      {reply.message}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => replyHandleState(null)}
+                  className="w-6 h-6 text-gray-500 transition duration-300 rounded-full hover:text-gray-400 focus:outline-none"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-4 h-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="flex px-6 py-1.5 border-t border-gray-700 z-50">
+          <ChatInputMessage
+            reply={reply}
+            setReply={setReply}
+            setIsTyping={setIsTyping}
+          />
+        </div>
+      </div>
+    </>
+  );
+}
+
+Show.layout = (page) => <App children={page} />;
+
+```
+
+## Kesimpulan
+
+Dengan mengikuti langkah-langkah ini, Anda telah berhasil mengimplementasikan fitur "Is Online" dan "Last Seen" dalam aplikasi Laravel Messenger Anda, serta menambahkan kemampuan untuk menampilkan daftar pengguna online secara real-time menggunakan Laravel Echo. Fitur ini akan meningkatkan interaksi pengguna dengan menunjukkan status online dan waktu terakhir pengguna aktif. Terus ikuti seri tutorial ini untuk mempelajari lebih lanjut tentang pengembangan aplikasi Laravel Messenger yang canggih dan interaktif!
