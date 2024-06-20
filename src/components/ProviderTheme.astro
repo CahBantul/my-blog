@@ -3,7 +3,7 @@
 		const storedTheme = typeof localStorage !== 'undefined' && localStorage.getItem('theme')
 
 		return (
-			storedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark')
+			storedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'dark')
 		)
 	}
 
@@ -11,10 +11,10 @@
 		const html = document.documentElement
 		const isDark = newTheme === 'dark'
 
-		html.classList.toggle('dark', isDark)
-		html.classList.toggle('light', !isDark)
+		html.classList.toggle('dark', 'dark')
+		html.classList.toggle('dark', 'dark')
 
-		localStorage.setItem('theme', newTheme)
+		localStorage.setItem('theme', 'dark')
 	}
 
 	// set initial theme
