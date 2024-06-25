@@ -1,0 +1,98 @@
+---
+heroImage: /src/assets/images/arnold-francisca-f77Bh3inUpE-unsplash.jpg
+category: Fullstack
+description: >-
+  Pelajari bagaimana Git Flow dapat memudahkan pengelolaan pengembangan
+  perangkat lunak Anda. Artikel ini memberikan panduan langkah demi langkah
+  dalam menggunakan Git Flow, termasuk cara mengatur cabang utama, mengelola
+  fitur, merilis versi baru, dan menangani hotfix. Dengan Git Flow, tim Anda
+  dapat bekerja lebih terstruktur dan efisien.
+pubDate: 2024-06-24T17:00:00.000Z
+tags:
+  - git
+title: Panduan Praktis Git Flow untuk Pengembangan Perangkat Lunak
+---
+
+## Cheat Sheet Git Flow
+
+Git Flow adalah model branching Git yang membantu mengelola fitur dan rilis dalam proyek pengembangan perangkat lunak. Berikut adalah langkah-langkah penggunaan Git Flow:
+
+### Persiapan Awal
+
+1. **Instalasi Git Flow**
+
+```shell
+   git flow init
+```
+
+Ikuti instruksi untuk mengatur nama cabang default (misalnya, `main` untuk cabang utama).
+
+### Cabang Utama
+
+1. **Cabang `main` dan `develop`**
+   * `main`: Cabang ini menyimpan kode yang selalu stabil dan siap dirilis.
+   * `develop`: Cabang ini berisi kode terbaru yang sedang dalam pengembangan.
+
+### Mengelola Fitur
+
+1. **Membuat Cabang Fitur**
+
+```shell
+   git flow feature start <nama_fitur>
+```
+
+Buat cabang baru untuk fitur yang akan dikembangkan.
+
+1. **Menyelesaikan Fitur**
+
+```shell
+   git flow feature finish <nama_fitur>
+```
+
+Gabungkan cabang fitur ke `develop` setelah pengembangan selesai.
+
+### Mengelola Rilis
+
+1. **Membuat Cabang Rilis**
+
+```shell
+   git flow release start <versi_rilis>
+```
+
+Buat cabang baru untuk menyiapkan rilis versi baru.
+
+1. **Menyelesaikan Rilis**
+
+```shell
+   git flow release finish <versi_rilis>
+```
+
+Gabungkan cabang rilis ke `main` dan `develop`, serta buat tag untuk versi tersebut.
+
+### Mengelola Hotfix
+
+1. **Membuat Cabang Hotfix**
+
+```shell
+   git flow hotfix start <versi_hotfix>
+```
+
+Buat cabang baru untuk memperbaiki bug di cabang `main`.
+
+1. **Menyelesaikan Hotfix**
+
+```shell
+   git flow hotfix finish <versi_hotfix>
+```
+
+Gabungkan cabang hotfix ke `main` dan `develop`, serta buat tag untuk versi tersebut.
+
+### Alur Kerja Git Flow
+
+1. Pengembangan fitur dilakukan di cabang `feature`.
+2. Saat fitur selesai, gabungkan ke `develop`.
+3. Siapkan rilis dari `develop` ke `release`.
+4. Gabungkan rilis yang selesai ke `main` dan `develop`.
+5. Perbaiki bug kritis di `main` melalui cabang `hotfix`.
+
+Dengan mengikuti Git Flow, tim pengembang dapat mengelola versi perangkat lunak dengan lebih terstruktur dan efisien.
