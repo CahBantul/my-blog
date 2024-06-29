@@ -19,7 +19,7 @@ Selamat datang kembali di seri tutorial Laravel Messenger! Pada tutorial ini, ki
 
 Pastikan event Anda menggunakan private channel. Ubah file app\Events\MessageSent.php, ubah channel broadcasting dari public ke private:
 
-```php
+```php title="php"
 <?php
 
 namespace App\Events;
@@ -63,7 +63,7 @@ class MessageSent implements ShouldBroadcastNow
 
 Ubah public channel menjadi private channel di file routes\channels.php. Misalnya, jika Anda memiliki public channel message-sent-channel, ubah menjadi private channel seperti berikut:
 
-```php
+```php title="php"
 <?php
 
 use Illuminate\Support\Facades\Broadcast;
@@ -79,7 +79,7 @@ Di sini, kita menggunakan model binding untuk memverifikasi bahwa pengguna yang 
 
 Di sisi klien, pastikan Anda menggunakan private channel untuk mendengarkan event. Pada file resources\js\Layouts\App.jsx, ubah channel yang didengarkan menjadi private:
 
-```php
+```php title="php"
 //resources\js\Layouts\App.jsx
 
 import React, { useEffect } from "react";
@@ -150,7 +150,7 @@ export default function ({ children }) {
 
 Karena pada MessageSent event kita menggunakan receiver id yang di dapat dari variabel message, maka ketika nge broadcast kita perlu me load receiver juga. Jadi mari kira update app\Http\Controllers\MessageController.php menjadi :
 
-```php
+```php title="php"
    public function store(User $user, Request $request)
     {
         /** @var User $authUser */
@@ -170,13 +170,13 @@ Karena pada MessageSent event kita menggunakan receiver id yang di dapat dari va
 
 Agar lebih aman untuk identifiernya kita rubah dari id menjadi uuid, oleh karena itu kita lakukan alter table user degan menambahkan kolom uuid
 
-```shell
+```shell title="shell"
 php artisan make:migration "add uuid to users table"
 ```
 
 Buka file migration yang baru dibuat di database/migrations/ dan tambahkan kode berikut:
 
-```php
+```php title="php"
 <?php
 
 use App\Models\User;
@@ -221,7 +221,7 @@ return new class extends Migration
 
 Jalankan perintah berikut untuk menjalankan migration:
 
-```shell
+```shell title="shell"
 php artisan migrate
 ```
 
@@ -229,7 +229,7 @@ php artisan migrate
 
 Buka model User dan tambahkan uuid ke dalam $fillable:
 
-```php
+```php title="php"
 <?php
 
 namespace App\Models;
@@ -301,7 +301,7 @@ class User extends Authenticatable
 
 ```
 
-Setelah itu rubah id menjadi uuid pada file app\Events\MessageSent.php  dan resources\js\Layouts\App.jsx
+Setelah itu rubah id menjadi uuid pada file app\Events\MessageSent.php dan resources\js\Layouts\App.jsx
 
 ## Kesimpulan
 

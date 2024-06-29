@@ -17,11 +17,11 @@ title: 'Laravel Messenger #9 - Membuat Fitur "is Typing" dan "Read Message"'
 
 Selamat datang kembali di seri tutorial Laravel Messenger! Pada tutorial ini, kita akan menambahkan dua fitur penting: "is Typing" dan "Read Message". Fitur "is Typing" memberi tahu pengguna saat lawan bicara sedang mengetik, sementara fitur "Read Message" menunjukkan bahwa pesan telah dibaca. Ikuti langkah-langkah di bawah ini untuk mengimplementasikan fitur-fitur ini.
 
-## Langkah 1: Update seen\_at Pada Table messages
+## Langkah 1: Update seen_at Pada Table messages
 
-Pertama, kita akan memperbarui method show pada MessageController agar menambahkan nilai seen\_at pada pesan yang seen\_at-nya masih null. Tambahkan 2 baris kode berikut ini sebelum return pada methos show
+Pertama, kita akan memperbarui method show pada MessageController agar menambahkan nilai seen_at pada pesan yang seen_at-nya masih null. Tambahkan 2 baris kode berikut ini sebelum return pada methos show
 
-```php
+```php title="php"
 $chats = $user->sendMessage()->where('receiver_id', auth()->id())->whereNull('seen_at')->get();
 $chats->each->update(['seen_at' => now()]);
 ```
@@ -30,14 +30,14 @@ $chats->each->update(['seen_at' => now()]);
 
 Sekarang, kita akan menambahkan event whisper pada input pesan untuk memberi tahu lawan bicara bahwa pengguna sedang mengetik. Langsung saja tambahkan code berikut pada resources\js\Components\ChatInputMessage.jsx
 
-```javascript
+```javascript title="javascript"
 const onTyping = () => {
-  setTimeout(() => {
-    Echo.private(`message-sent-channel.${chatWithUser.uuid}`).whisper("typing", {
-      name: chatWithUser.name,
-    });
-  }, 300);
-};
+	setTimeout(() => {
+		Echo.private(`message-sent-channel.${chatWithUser.uuid}`).whisper('typing', {
+			name: chatWithUser.name
+		})
+	}, 300)
+}
 ```
 
 Fungsi onTyping ini akan mengirimkan whisper event "typing" ke channel private message-sent-channel yang diidentifikasi oleh UUID dari pengguna yang sedang diajak chat (chatWithUser.uuid). Ini memberi tahu pengguna lain bahwa lawan bicara sedang mengetik.
@@ -46,14 +46,14 @@ Fungsi onTyping ini akan mengirimkan whisper event "typing" ke channel private m
 
 Sekarang, kita akan mendengarkan event whisper di komponen chat untuk menampilkan indikator "is Typing". Langsung saja tambahkan code berikut ini pada resources\js\Pages\Chat\Show\.jsx
 
-```javascript
-Echo.private("message-sent-channel." + auth.user.uuid).listenForWhisper("typing", () => {
-  setIsTyping(true);
+```javascript title="javascript"
+Echo.private('message-sent-channel.' + auth.user.uuid).listenForWhisper('typing', () => {
+	setIsTyping(true)
 
-  setTimeout(() => {
-    setIsTyping(false);
-  }, 2000);
-});
+	setTimeout(() => {
+		setIsTyping(false)
+	}, 2000)
+})
 ```
 
 Kode ini mendengarkan whisper event "typing" di channel private message-sent-channel yang diidentifikasi oleh UUID dari pengguna yang sedang diajak chat (auth.user.uuid). Ketika event diterima, fungsi callback akan menampilkan indikator "is Typing" selama 2 detik sebelum menyembunyikannya lagi.

@@ -20,83 +20,83 @@ Berikut beberapa library dan metode yang bisa digunakan untuk mencetak ke printe
 ## PrintJS
 
 1. **PrintJS**: Library JavaScript sederhana yang mendukung pencetakan dari aplikasi web. Ini memungkinkan pencetakan PDF, gambar, HTML, dan elemen DOM.
-   * **Install**: `npm install print-js`
-   * **Penggunaan**:
+   - **Install**: `npm install print-js`
+   - **Penggunaan**:
 
-```javascript
-     import printJS from 'print-js';
+```javascript title="javascript"
+import printJS from 'print-js'
 
-     // Mencetak elemen HTML
-     printJS('print-area', 'html');
+// Mencetak elemen HTML
+printJS('print-area', 'html')
 ```
 
 1. **jsPrintManager**: Library ini memungkinkan komunikasi antara aplikasi web dan printer melalui JavaScript. Ini mendukung berbagai jenis printer termasuk dot matrix.
-   * **Install**: `npm install jsprintmanager`
-   * **Penggunaan**:
+   - **Install**: `npm install jsprintmanager`
+   - **Penggunaan**:
 
-```javascript
-   import JSPM from 'jsprintmanager';
+```javascript title="javascript"
+import JSPM from 'jsprintmanager'
 
-   JSPM.JSPrintManager.auto_reconnect = true;
-   JSPM.JSPrintManager.start();
+JSPM.JSPrintManager.auto_reconnect = true
+JSPM.JSPrintManager.start()
 
-   JSPM.JSPrintManager.WS.onStatusChanged = function () {
-     if (jspmWSStatus()) {
-       // Mendapatkan daftar printer
-       JSPM.JSPrintManager.getPrinters().then(function (printers) {
-         let myPrinter = printers.find(printer => printer.indexOf('dot_matrix_printer_name') !== -1);
-         
-         if (myPrinter) {
-           let cpj = new JSPM.ClientPrintJob();
-           cpj.clientPrinter = new JSPM.InstalledPrinter(myPrinter);
-           
-           // Menambahkan konten untuk dicetak
-           cpj.printerCommands = 'Your RAW Printing Data Here';
-           
-           // Mengirim pekerjaan cetak
-           cpj.sendToClient();
-         }
-       });
-     }
-   };
+JSPM.JSPrintManager.WS.onStatusChanged = function () {
+	if (jspmWSStatus()) {
+		// Mendapatkan daftar printer
+		JSPM.JSPrintManager.getPrinters().then(function (printers) {
+			let myPrinter = printers.find((printer) => printer.indexOf('dot_matrix_printer_name') !== -1)
 
-   function jspmWSStatus() {
-     return JSPM.JSPrintManager.websocket_status === JSPM.WSStatus.Open;
-   }
+			if (myPrinter) {
+				let cpj = new JSPM.ClientPrintJob()
+				cpj.clientPrinter = new JSPM.InstalledPrinter(myPrinter)
+
+				// Menambahkan konten untuk dicetak
+				cpj.printerCommands = 'Your RAW Printing Data Here'
+
+				// Mengirim pekerjaan cetak
+				cpj.sendToClient()
+			}
+		})
+	}
+}
+
+function jspmWSStatus() {
+	return JSPM.JSPrintManager.websocket_status === JSPM.WSStatus.Open
+}
 ```
 
 1. **ESC/POS Commands**: Printer dot matrix biasanya mendukung komando ESC/POS. Anda dapat mengirim komando ini langsung ke printer menggunakan library seperti `node-escpos` jika Anda mengembangkan aplikasi server-side dengan Node.js.
-   * **Install**: `npm install escpos`
-   * **Penggunaan**:
+   - **Install**: `npm install escpos`
+   - **Penggunaan**:
 
-```javascript
-     const escpos = require('escpos');
-     escpos.Network = require('escpos-network');
+```javascript title="javascript"
+const escpos = require('escpos')
+escpos.Network = require('escpos-network')
 
-     const device = new escpos.Network('192.168.1.100'); // IP Address printer
-     const printer = new escpos.Printer(device);
+const device = new escpos.Network('192.168.1.100') // IP Address printer
+const printer = new escpos.Printer(device)
 
-     device.open(function() {
-       printer
-         .text('Hello World')
-         .cut()
-         .close();
-     });
+device.open(function () {
+	printer.text('Hello World').cut().close()
+})
 ```
 
 1. **QZ Tray**: Tool lain yang dapat digunakan untuk mengirim data cetak ke printer dot matrix adalah QZ Tray. Ini adalah aplikasi desktop yang memungkinkan aplikasi web untuk mencetak secara langsung ke printer.
-   * **Download dan Install**: [QZ Tray](https://qz.io/download/)
-   * **Penggunaan**:
+   - **Download dan Install**: [QZ Tray](https://qz.io/download/)
+   - **Penggunaan**:
 
 ```html
-     <script src="https://unpkg.com/qz-tray"></script>
-     <script>
-       qz.websocket.connect().then(() => {
-         const config = qz.configs.create('Printer_Name');
-         const data = ['Hello World\n'];
-         qz.print(config, data).catch(console.error);
-       }).catch(console.error);
-     </script>
+<script src="https://unpkg.com/qz-tray"></script>
+<script>
+	qz.websocket
+		.connect()
+		.then(() => {
+			const config = qz.configs.create('Printer_Name')
+			const data = ['Hello World\n']
+			qz.print(config, data).catch(console.error)
+		})
+		.catch(console.error)
+</script>
 ```
 
 ## Contoh Penggunaan di Vue.js
@@ -105,34 +105,34 @@ Menggunakan `PrintJS` untuk mencetak elemen HTML dalam komponen Vue:
 
 ```html
 <template>
-  <div id="print-area">
-    <h1>Invoice</h1>
-    <p>Item: {{ item }}</p>
-    <p>Quantity: {{ quantity }}</p>
-    <p>Price: {{ price }}</p>
-    <p>Total: {{ total }}</p>
-  </div>
-  <button @click="print">Print</button>
+	<div id="print-area">
+		<h1>Invoice</h1>
+		<p>Item: {{ item }}</p>
+		<p>Quantity: {{ quantity }}</p>
+		<p>Price: {{ price }}</p>
+		<p>Total: {{ total }}</p>
+	</div>
+	<button @click="print">Print</button>
 </template>
 
 <script>
-import printJS from 'print-js';
+	import printJS from 'print-js'
 
-export default {
-  data() {
-    return {
-      item: 'Widget',
-      quantity: 2,
-      price: 10,
-      total: 20
-    };
-  },
-  methods: {
-    print() {
-      printJS('print-area', 'html');
-    }
-  }
-};
+	export default {
+		data() {
+			return {
+				item: 'Widget',
+				quantity: 2,
+				price: 10,
+				total: 20
+			}
+		},
+		methods: {
+			print() {
+				printJS('print-area', 'html')
+			}
+		}
+	}
 </script>
 ```
 

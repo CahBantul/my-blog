@@ -20,7 +20,7 @@ Pertama, mari buat model dan migration untuk pesan kita. Di dalam Laravel, model
 
 Untuk membuat model dan migration, jalankan perintah artisan berikut di terminal:
 
-```shell
+```shell title="shell"
 php artisan make:model Message -m
 ```
 
@@ -28,9 +28,9 @@ php artisan make:model Message -m
 
 ## Langkah 2: Menambahkan Field Pada File Migration
 
-Selanjutnya edit file migration pada project saya bernama 2024\_05\_03\_172433\_create\_messages\_table.php menjadi seperti di bawah ini
+Selanjutnya edit file migration pada project saya bernama 2024_05_03_172433_create_messages_table.php menjadi seperti di bawah ini
 
-```php
+```php title="xxxx_create_messages_table.php"
 public function up(): void
 {
     Schema::create('messages', function (Blueprint $table) {
@@ -50,7 +50,7 @@ public function up(): void
 
 Buka file model Message.php dan tentukan properti untuk Mass Assignment dan relasi yang diperlukan.
 
-```php
+```php title="app/models/Messages.php"
 <?php
 
 namespace App\Models;
@@ -83,7 +83,7 @@ class Message extends Model
 
 Buka file model User.php dan tbuat relasi yang diperlukan.
 
-```php
+```php title="app/models/User.php"
 <?php
 
 namespace App\Models;
@@ -148,7 +148,7 @@ class User extends Authenticatable
 
 Langkah selanjutnya kita jalankan proses migrate database. Pada tutorial inis aya menggunakan database sqlite, jika anda ingin menggunakan mysql atau postgre tinggal diganti dibagian .env saja. Untuk menjalankan proses migrate cukun jalankah perintah
 
-```php
+```shell title="shell"
 php artisan migrate
 ```
 

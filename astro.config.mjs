@@ -4,6 +4,10 @@ import sitemap from '@astrojs/sitemap'
 import tailwind from '@astrojs/tailwind'
 import { remarkReadingTime } from './src/utils/readTime.ts'
 import { externalLink } from './src/externalLink.ts'
+import { rehypePrettyCode } from 'rehype-pretty-code'
+// import moonlightTheme from './public/theme/moonlight-ii.json'
+import { transformerCopyButton } from '@rehype-pretty/transformers'
+import { transformerNotationDiff } from '@shikijs/transformers'
 
 // https://astro.build/config
 export default defineConfig({
@@ -11,25 +15,22 @@ export default defineConfig({
 	markdown: {
 		remarkPlugins: [remarkReadingTime],
 		drafts: true,
-		shikiConfig: {
-			theme: 'material-theme-palenight',
-			wrap: true
-		},
-		rehypePlugins: [[externalLink, { domain: "https://programmertelo.vercel.app" }]],
+		syntaxHighlight: false,
+		rehypePlugins: [
+			[
+				rehypePrettyCode,
+				{
+					// theme: moonlightTheme,
+					transformers: [
+						transformerCopyButton({
+							visibility: 'hover',
+							feedbackDuration: 2_500
+						})
+						// transformerNotationDiff()
+					]
+				}
+			]
+		]
 	},
-	integrations: [
-		mdx({
-			syntaxHighlight: 'shiki',
-			shikiConfig: {
-				experimentalThemes: {
-					light: 'vitesse-light',
-					dark: 'material-theme-palenight'
-				},
-				wrap: true
-			},
-			drafts: true
-		}),
-		sitemap(),
-		tailwind()
-	]
+	integrations: [mdx(), sitemap(), tailwind()]
 })

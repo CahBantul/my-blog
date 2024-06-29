@@ -32,16 +32,15 @@ In this tutorial, we will walk you through the step-by-step process of installin
 
 Before proceeding with the installation, ensure to remove any existing Go installations to prevent conflicts.
 
-```shell
+```shell title="shell"
 sudo rm - rf /usr/local/go
-
 ```
 
 ## Step 2: Download and Extract the Latest GoLang Release
 
 Download the latest version of GoLang from the official website. Replace go1.22.2.linux-amd64.tar.gz with the latest version available.
 
-```shell
+```shell title="shell"
 wget https://golang.org/dl/go1.22.2.linux-amd64.tar.gz
 sudo tar -C /usr/local -xzf go1.22.2.linux-amd64.tar.gz
 ```
@@ -50,10 +49,10 @@ This set of commands performs two main actions:
 
 1. `wget`: It's a command-line utility for downloading files from the internet. Here, it's being used to download the GoLang installation archive (`go1.22.2.linux-amd64.tar.gz`) from the official GoLang website ([https://golang.org/dl/](https://golang.org/dl/)).
 2. `sudo tar -C /usr/local -xzf go1.22.2.linux-amd64.tar.gz`: This command extracts the contents of the downloaded archive (`go1.22.2.linux-amd64.tar.gz`) into the `/usr/local` directory. Here's what each part does:
-   * `sudo`: It's used to execute the subsequent command with superuser (root) privileges, allowing the command to write to system directories like `/usr/local`.
-   * `tar`: It's a utility for archiving files. The `-xzf` options are used to extract (x) files from an archive, treating the input as a compressed archive (z), and specifying the archive file (f).
-   * `-C /usr/local`: This option tells tar to change to the specified directory (`/usr/local`) before performing any operations. This ensures that the extracted files are placed directly into `/usr/local`.
-   * `go1.22.2.linux-amd64.tar.gz`: This is the name of the archive file to be extracted.
+   - `sudo`: It's used to execute the subsequent command with superuser (root) privileges, allowing the command to write to system directories like `/usr/local`.
+   - `tar`: It's a utility for archiving files. The `-xzf` options are used to extract (x) files from an archive, treating the input as a compressed archive (z), and specifying the archive file (f).
+   - `-C /usr/local`: This option tells tar to change to the specified directory (`/usr/local`) before performing any operations. This ensures that the extracted files are placed directly into `/usr/local`.
+   - `go1.22.2.linux-amd64.tar.gz`: This is the name of the archive file to be extracted.
 
 Overall, these commands download the GoLang installation archive and extract its contents into the /usr/local directory, effectively installing GoLang on the system.
 
@@ -61,7 +60,7 @@ Overall, these commands download the GoLang installation archive and extract its
 
 To access Go executable from anywhere in the terminal, update the PATH environment variable by appending `/usr/local/go/bin` to it.
 
-```shell
+```shell title="shell"
 echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.profile
 source ~/.profile
 ```
@@ -87,7 +86,7 @@ If installed correctly, this command will display the installed version of Go.
 
 Create a directory to serve as your Go workspace where you'll store your Go code and projects.
 
-```shell
+```shell title="shell"
 mkdir -p ~/go/src
 echo 'export GOPATH=$HOME/go' >> ~/.profile
 echo 'export PATH=$PATH:$GOPATH/bin' >> ~/.profile
@@ -108,7 +107,7 @@ These commands set up your Go workspace and ensure that your Go executables are 
 
 To confirm everything is set up correctly, create a simple Go program and run it.
 
-```shell
+```shell title="shell"
 mkdir -p ~/go/src/hello
 echo 'package main\nimport "fmt"\nfunc main() {\n\tfmt.Println("Hello, Go!")\n}' > ~/go/src/hello/hello.go
 go run ~/go/src/hello/hello.go

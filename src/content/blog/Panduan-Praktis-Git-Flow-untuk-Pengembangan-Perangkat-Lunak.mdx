@@ -21,8 +21,8 @@ Git Flow adalah model branching Git yang membantu mengelola fitur dan rilis dala
 
 1. **Instalasi Git Flow**
 
-```shell
-   git flow init
+```shell title="shell"
+git flow init
 ```
 
 Ikuti instruksi untuk mengatur nama cabang default (misalnya, `main` untuk cabang utama).
@@ -30,23 +30,23 @@ Ikuti instruksi untuk mengatur nama cabang default (misalnya, `main` untuk caban
 ### Cabang Utama
 
 1. **Cabang `main` dan `develop`**
-   * `main`: Cabang ini menyimpan kode yang selalu stabil dan siap dirilis.
-   * `develop`: Cabang ini berisi kode terbaru yang sedang dalam pengembangan.
+   - `main`: Cabang ini menyimpan kode yang selalu stabil dan siap dirilis.
+   - `develop`: Cabang ini berisi kode terbaru yang sedang dalam pengembangan.
 
 ### Mengelola Fitur
 
 1. **Membuat Cabang Fitur**
 
-```shell
-   git flow feature start <nama_fitur>
+```shell title="shell"
+git flow feature start <nama_fitur>
 ```
 
 Buat cabang baru untuk fitur yang akan dikembangkan.
 
 1. **Menyelesaikan Fitur**
 
-```shell
-   git flow feature finish <nama_fitur>
+```shell title="shell"
+git flow feature finish <nama_fitur>
 ```
 
 Gabungkan cabang fitur ke `develop` setelah pengembangan selesai.
@@ -55,16 +55,16 @@ Gabungkan cabang fitur ke `develop` setelah pengembangan selesai.
 
 1. **Membuat Cabang Rilis**
 
-```shell
-   git flow release start <versi_rilis>
+```shell title="shell"
+git flow release start <versi_rilis>
 ```
 
 Buat cabang baru untuk menyiapkan rilis versi baru.
 
 1. **Menyelesaikan Rilis**
 
-```shell
-   git flow release finish <versi_rilis>
+```shell title="shell"
+git flow release finish <versi_rilis>
 ```
 
 Gabungkan cabang rilis ke `main` dan `develop`, serta buat tag untuk versi tersebut.
@@ -73,16 +73,16 @@ Gabungkan cabang rilis ke `main` dan `develop`, serta buat tag untuk versi terse
 
 1. **Membuat Cabang Hotfix**
 
-```shell
-   git flow hotfix start <versi_hotfix>
+```shell title="shell"
+git flow hotfix start <versi_hotfix>
 ```
 
 Buat cabang baru untuk memperbaiki bug di cabang `main`.
 
 1. **Menyelesaikan Hotfix**
 
-```shell
-   git flow hotfix finish <versi_hotfix>
+```shell title="shell"
+git flow hotfix finish <versi_hotfix>
 ```
 
 Gabungkan cabang hotfix ke `main` dan `develop`, serta buat tag untuk versi tersebut.

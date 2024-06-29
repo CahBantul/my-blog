@@ -14,7 +14,7 @@ Dalam perjalanan pengembangan aplikasi Laravel Messenger, langkah berikutnya yan
 
 Untuk membuat MessageController, Anda dapat menggunakan perintah artisan Laravel:
 
-```php
+```shell title="shell"
 php artisan make:controller MessageController --test
 ```
 
@@ -24,7 +24,7 @@ Ini akan membuat file MessageController.php di dalam direktori app/Http/Controll
 
 Selanjutnya kita akan membuat method index pada MessageController.php untuk merender halaman Chat/Index.jsx
 
-```php
+```php title="app/Http/Controllers/MessageController.php"
 <?php
 
 namespace App\Http\Controllers;
@@ -48,7 +48,7 @@ class MessageController extends Controller
 
 selanjutnya menambahkan endpoint pada file web.php pada directory routes/web.php.
 
-```php
+```php title="routes/web.php"
 <?php
 
 use App\Http\Controllers\MessageController;
@@ -86,7 +86,7 @@ require __DIR__.'/auth.php';
 
 Penting untuk menguji setiap metode dalam Controller Anda untuk memastikan bahwa mereka berfungsi sesuai yang diharapkan. Dengan menulis pengujian unit, Anda dapat memverifikasi bahwa setiap fungsi berjalan dengan benar dan menangani berbagai skenario dengan baik. Selanjutnya kita buka file MessageControllerTest.php yang terdapat pada directory tests/Feature/Http/Controllers
 
-```php
+```php title="app/models/User.php"
 <?php
 
 use App\Models\User;

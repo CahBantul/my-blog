@@ -18,7 +18,7 @@ Selamat datang kembali di seri tutorial Laravel Messenger! Pada tutorial ini, ki
 
 Untuk mengintall Laravel reverb cukup mudah tinggal jalan perintah di bawah ini
 
-```shell
+```shell title="shell"
 php artisan install:broadcasting
 ```
 
@@ -30,13 +30,13 @@ Setelah terinstall pada file bootstrap\app.php akan ditambahkan route channels d
 
 Langkah selanjutnya kita buat event untuk menghandle ketika pesan dikirim. Untuk membuat event tinggal jalankan perintah
 
-```php
+```php title="php"
 php artisan make:event MessageSent
 ```
 
 perintah ini akan mengenerate file app\Events\MessageSent.php selanjuta kita edit file tersebut menjadi seperti di bawah ini
 
-```php
+```php title="php"
 <?php
 
 namespace App\Events;
@@ -80,7 +80,7 @@ class MessageSent
 
 Selanjutnya kita update method store dengan menambahkan function broadcast yang memanggil MessageSent event.
 
-```php
+```php title="php"
  public function store(User $user, Request $request)
     {
         /** @var User $authUser */
@@ -100,49 +100,47 @@ Selanjutnya kita update method store dengan menambahkan function broadcast yang 
 
 Selanjutnya kita tinggal memanggil echo pada resources\js\Layouts\App.jsx. Echo ini akan kita bungkus pada useEffect dan juga menggunakan debounce agar ada interval di hit nya. Berikut ini code yang ditambahkan di sebelum return
 
-```javascript
+```javascript title="javascript"
 useEffect(() => {
-  const debouncedReload = debounce(() => {
-    router.reload({
-      preserveScoll: true,
-      only: ["messages", "users"],
-    });
-  }, 300);
+	const debouncedReload = debounce(() => {
+		router.reload({
+			preserveScoll: true,
+			only: ['messages', 'users']
+		})
+	}, 300)
 
-  Echo.channel("message-sent-channel").listen("MessageSent", () =>
-    debouncedReload()
-  );
+	Echo.channel('message-sent-channel').listen('MessageSent', () => debouncedReload())
 
-  return () => {
-    Echo.channel("message-sent-channel").stopListening("MessageSent");
-  };
-}, []);
+	return () => {
+		Echo.channel('message-sent-channel').stopListening('MessageSent')
+	}
+}, [])
 ```
 
 ## Langkah 5: Update Submit Handler pada ChatInputMessage
 
 Selanjutnya kita update submit handler pada component ChatInputMessage dengan menambahkan headers yang berisi socketid.
 
-```javascript
+```javascript title="javascript"
 const submitHandler = (e) => {
-  e.preventDefault();
-  post(route("chat.store", chatWithUser.id), {
-    headers: {
-      "X-Socket-Id": Echo.socketId(),
-    },
-    onStart: () => {
-      reset();
-      e.target.style.height = "auto";
-      props.setReply(null);
-      props.setIsTyping(false);
-    },
-    preserveScroll: true,
-  });
-};
+	e.preventDefault()
+	post(route('chat.store', chatWithUser.id), {
+		headers: {
+			'X-Socket-Id': Echo.socketId()
+		},
+		onStart: () => {
+			reset()
+			e.target.style.height = 'auto'
+			props.setReply(null)
+			props.setIsTyping(false)
+		},
+		preserveScroll: true
+	})
+}
 ```
 
 ## Kesimpulan
 
-Sekarang Anda telah berhasil menginstal Laravel Reverb ke dalam proyek Laravel Messenger Anda. Ini membuka pintu untuk mengimplementasikan fitur pesan real-time dengan mudah. Pastikan untuk membaca dokumentasi resmi [Laravel Reverb](https://laravel.com/docs/11.x/reverb "laravel reverb") untuk mempelajari lebih lanjut tentang cara menggunakan semua fiturnya.
+Sekarang Anda telah berhasil menginstal Laravel Reverb ke dalam proyek Laravel Messenger Anda. Ini membuka pintu untuk mengimplementasikan fitur pesan real-time dengan mudah. Pastikan untuk membaca dokumentasi resmi [Laravel Reverb](https://laravel.com/docs/11.x/reverb 'laravel reverb') untuk mempelajari lebih lanjut tentang cara menggunakan semua fiturnya.
 
 Dengan langkah-langkah ini, proyek Laravel Messenger Anda semakin berkembang dan semakin mendekati visi Anda. Tetap disini untuk tutorial selanjutnya di mana kita akan melangkah lebih jauh dengan mengimplementasikan fitur-fitur tambahan!
