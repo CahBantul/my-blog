@@ -31,9 +31,6 @@ devDependencies:
   '@rehype-pretty/transformers':
     specifier: ^0.13.2
     version: 0.13.2
-  '@shikijs/transformers':
-    specifier: ^1.10.0
-    version: 1.10.0
   '@tailwindcss/typography':
     specifier: 0.5.10
     version: 0.5.10(tailwindcss@3.4.3)
@@ -3845,12 +3842,6 @@ packages:
 
   /@shikijs/core@1.10.0:
     resolution: {integrity: sha512-BZcr6FCmPfP6TXaekvujZcnkFmJHZ/Yglu97r/9VjzVndQA56/F4WjUKtJRQUnK59Wi7p/UTAOekMfCJv7jnYg==}
-    dev: true
-
-  /@shikijs/transformers@1.10.0:
-    resolution: {integrity: sha512-5Eu/kuJu7/CzAjFlTJkyyPoLTLSVQZ31Ps81cjIeR/3PDJ2RUuX1/R8d0qFziBKToym1LXbNiXoJQq0mg5+Cwg==}
-    dependencies:
-      shiki: 1.10.0
     dev: true
 
   /@svgr/babel-plugin-add-jsx-attribute@6.5.1(@babel/core@7.23.2):
