@@ -56,6 +56,7 @@ code {
 
 pre > code {
   counter-reset: line;
+  @apply max-h-96;
 }
 
 code[data-theme*=' '],
@@ -134,7 +135,7 @@ figure {
 pre,
 code,
 figure {
-  @apply overflow-x-auto overflow-y-auto px-2 py-1;
+  @apply  px-2 py-1;
 }
 p {
   @apply text-xl;
