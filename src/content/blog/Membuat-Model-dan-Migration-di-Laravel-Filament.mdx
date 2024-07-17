@@ -1,0 +1,121 @@
+---
+heroImage: /src/assets/images/Laravel 11 Filament.png
+category: Fullstack
+description: >-
+  Selamat datang kembali di seri tutorial Laravel Filament! Dalam video ini,
+  kita akan membahas cara membuat Model dan Migration di Laravel dengan contoh
+  model Country, State, City, Department, dan Employee.
+pubDate: 2024-07-16T17:00:00.000Z
+tags:
+  - filament
+  - laravel
+title: Membuat Model dan Migration di Laravel Filament
+---
+
+Selamat datang kembali di seri tutorial Laravel Filament! Dalam video ini, kita akan membahas cara membuat Model dan Migration di Laravel dengan contoh model **Country**, **State**, **City**, **Department**, dan **Employee**. Ikuti langkah-langkah berikut untuk memulai:
+
+## Langkah-langkah:
+
+### **Membuat Model dan Migration**:
+
+```shell
+   php artisan make:model Country -m
+   php artisan make:model State -m
+   php artisan make:model City -m
+   php artisan make:model Department -m
+   php artisan make:model Employee -m
+```
+
+### **Mengedit Migration**:
+
+Tambahkan kolom yang diperlukan ke file migration di direktori `database/migrations`:
+
+- **Country**:
+
+```php
+   public function up()
+   {
+       Schema::create('countries', function (Blueprint $table) {
+           $table->id();
+           $table->string('name');
+           $table->timestamps();
+       });
+   }
+```
+
+- **State**:
+
+```php
+   public function up()
+   {
+       Schema::create('states', function (Blueprint $table) {
+           $table->id();
+           $table->string('name');
+           $table->foreignId('country_id')->constrained()->onDelete('cascade');
+           $table->timestamps();
+       });
+   }
+```
+
+- **City**:
+
+```php
+   public function up()
+   {
+       Schema::create('cities', function (Blueprint $table) {
+           $table->id();
+           $table->string('name');
+           $table->foreignId('state_id')->constrained()->onDelete('cascade');
+           $table->timestamps();
+       });
+   }
+```
+
+- **Department**:
+
+```php
+   public function up()
+   {
+       Schema::create('departments', function (Blueprint $table) {
+           $table->id();
+           $table->string('name');
+           $table->timestamps();
+       });
+   }
+```
+
+- **Employee**:
+
+```php
+   public function up()
+   {
+       Schema::create('employees', function (Blueprint $table) {
+           $table->id();
+           $table->string('first_name');
+           $table->string('last_name');
+           $table->string('middle_name')->nullable();
+           $table->string('address');
+           $table->date('date_hired');
+           $table->date('date_of_birth');
+           $table->timestamps();
+       });
+   }
+```
+
+### **Menjalankan Migration**:
+
+```shell
+   php artisan migrate
+```
+
+Perintah ini akan membuat tabel di database sesuai dengan struktur yang telah ditentukan.
+
+## Sumber Daya:
+
+- Dokumentasi Laravel: [https://laravel.com/docs/11.x/migrations](https://laravel.com/docs/11.x/migrations)
+
+Jangan lupa Like, Subscribe, dan aktifkan notifikasi untuk mendapatkan update terbaru dari kami!
+
+---
+
+Selamat mencoba dan semoga sukses dengan proyek Laravel Anda!
