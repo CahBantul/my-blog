@@ -1,0 +1,78 @@
+---
+heroImage: /src/assets/images/virtbox_1.jpg
+category: Operating Systems
+description: >-
+  Cara mudah menginstal Kali Linux di Windows menggunakan VirtualBox. Ikuti
+  langkah-langkah sederhana mulai dari mengunduh software hingga konfigurasi VM
+  dan instalasi Kali Linux. Nikmati fitur Kali Linux tanpa mengubah sistem utama
+  Anda.
+pubDate: 2024-07-19T17:00:00.000Z
+tags:
+  - vm
+  - os
+title: Cara Install VM Kali Linux di Windows
+---
+
+## Cara Install VM Kali Linux di Windows
+
+Virtual Machine (VM) adalah solusi yang tepat untuk menjalankan beberapa sistem operasi secara bersamaan pada satu perangkat. Bagi Anda yang ingin mencoba atau menggunakan Kali Linux tanpa harus menginstal ulang sistem operasi utama Anda, VM adalah jawabannya. Berikut adalah langkah-langkah untuk menginstal Kali Linux di Windows menggunakan VirtualBox, salah satu software VM yang populer dan gratis.
+
+### Langkah 1: Unduh dan Instal VirtualBox
+
+1. **Unduh VirtualBox:**
+   - Kunjungi situs resmi VirtualBox di [https://www.virtualbox.org/](https://www.virtualbox.org/).
+   - Pilih versi yang sesuai dengan sistem operasi Windows Anda dan unduh installer-nya.
+2. **Instal VirtualBox:**
+   - Buka file installer yang telah diunduh.
+   - Ikuti petunjuk instalasi dengan mengklik "Next" dan "Install".
+   - Setelah selesai, klik "Finish" untuk menyelesaikan instalasi dan buka VirtualBox.
+
+### Langkah 2: Unduh Kali Linux ISO
+
+1. **Kunjungi Situs Kali Linux:**
+   - Buka situs resmi Kali Linux di [https://www.kali.org/](https://www.kali.org/).
+2. **Unduh ISO:**
+   - Pilih "Download" dan pilih versi ISO yang sesuai dengan kebutuhan Anda (32-bit atau 64-bit).
+   - Unduh file ISO ke komputer Anda.
+
+### Langkah 3: Buat Virtual Machine Baru di VirtualBox
+
+1. **Buka VirtualBox:**
+   - Setelah VirtualBox terbuka, klik "New" untuk membuat VM baru.
+2. **Konfigurasi VM:**
+   - **Nama:** Berikan nama pada VM, misalnya "Kali Linux".
+   - **Jenis:** Pilih "Linux".
+   - **Versi:** Pilih "Debian (64-bit)" atau "Debian (32-bit)" sesuai dengan versi ISO yang Anda unduh.
+3. **Atur Memori (RAM):**
+   - Pilih jumlah memori (RAM) yang akan dialokasikan untuk VM. Disarankan minimal 2GB (2048 MB).
+4. **Buat Hard Disk Virtual:**
+   - Pilih "Create a virtual hard disk now" dan klik "Create".
+   - Pilih "VDI (VirtualBox Disk Image)" dan klik "Next".
+   - Pilih "Dynamically allocated" dan klik "Next".
+   - Atur ukuran hard disk virtual minimal 20GB, lalu klik "Create".
+
+### Langkah 4: Instal Kali Linux di Virtual Machine
+
+1. **Mulai VM:**
+   - Pilih VM "Kali Linux" yang baru dibuat dan klik "Start".
+2. **Pilih File ISO:**
+   - Saat diminta untuk memilih disk, klik ikon folder dan pilih file ISO Kali Linux yang telah diunduh.
+   - Klik "Start" untuk melanjutkan.
+3. **Instalasi Kali Linux:**
+   - Ikuti langkah-langkah instalasi yang muncul di layar.
+   - Pilih "Graphical Install" untuk antarmuka yang lebih user-friendly.
+   - Ikuti petunjuk instalasi seperti memilih bahasa, zona waktu, dan partisi hard disk.
+   - Buat akun pengguna dan password sesuai instruksi.
+
+### Langkah 5: Selesaikan Instalasi
+
+1. **Finalisasi Instalasi:**
+   - Setelah semua langkah instalasi selesai, sistem akan meminta untuk reboot.
+   - Setelah reboot, Kali Linux akan siap digunakan di VM Anda.
+
+### Tips Tambahan
+
+- **Snapshots:** Gunakan fitur snapshots di VirtualBox untuk menyimpan keadaan VM Anda sebelum melakukan perubahan besar.
+- **Shared Folders:** Aktifkan fitur shared folders di VirtualBox untuk berbagi file antara host Windows dan VM Kali Linux.
+
+Dengan mengikuti langkah-langkah di atas, Anda dapat menjalankan Kali Linux di Windows menggunakan VirtualBox. Selamat mencoba dan semoga berhasil!
