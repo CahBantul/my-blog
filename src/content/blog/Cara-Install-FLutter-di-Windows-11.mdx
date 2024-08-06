@@ -1,0 +1,112 @@
+---
+heroImage: /src/assets/images/cara install flutter.png
+category: mobile
+description: >-
+  Pelajari cara menginstal Flutter di Windows dengan langkah mudah. Mulai dari
+  persiapan sistem, unduh Flutter SDK, verifikasi instalasi, hingga setup editor
+  dan emulator.
+pubDate: 2024-08-05T17:00:00.000Z
+tags:
+  - mobile
+title: Cara Install FLutter di Windows 11
+---
+
+Berikut adalah tutorial langkah demi langkah untuk menginstal Flutter di Windows berdasarkan situs [dokumentasi Flutter](https://docs.flutter.dev/get-started/install/windows/desktop).
+
+## Langkah 1: Persiapan Sistem
+
+### 1.1. Sistem Operasi
+
+Pastikan Anda menggunakan sistem operasi Windows 10 atau yang lebih baru pada kesempatan ini saya menggunakan Windows 11.
+
+### 1.2. Tools yang Diperlukan
+
+- **PowerShell 5.0** atau yang lebih baru (sudah termasuk dalam Windows 11).
+- **Git** untuk Windows.
+
+### 1.3. Ruang Penyimpanan
+
+Pastikan Anda memiliki setidaknya 1.64 GB ruang kosong (tidak termasuk ruang untuk alat pengembangan seperti Android Studio).
+
+## Langkah 2: Unduh dan Instal Flutter SDK
+
+### 2.1. Unduh Flutter SDK
+
+1. Buka [halaman unduhan Flutter](https://docs.flutter.dev/get-started/install/windows/desktop).
+2. Klik tautan untuk mengunduh file zip terbaru dari Flutter SDK.
+
+### 2.2. Ekstrak Flutter SDK
+
+1. Ekstrak file zip ke direktori yang Anda pilih (misalnya, `C:\src\flutter`; jangan letakkan di `C:\Program Files\` karena membutuhkan izin admin).
+
+### 2.3. Tambahkan Flutter ke PATH
+
+1. Buka **Control Panel** > **System and Security** > **System**.
+2. Klik **Advanced system settings** > **Environment Variables**.
+3. Di bawah **User variables**, temukan variabel `Path` dan klik **Edit**.
+4. Klik **New** dan tambahkan path ke direktori Flutter (`C:\src\flutter\bin`).
+5. Klik **OK** untuk menyimpan perubahan.
+
+## Langkah 3: Verifikasi Instalasi Flutter
+
+1. Buka **Command Prompt** atau **PowerShell**.
+2. Jalankan perintah berikut untuk memverifikasi instalasi:
+
+```shell
+   flutter doctor
+```
+
+1. Perintah ini akan menampilkan daftar perangkat yang diperlukan untuk mengembangkan aplikasi Flutter. Jika ada masalah, perbaiki sesuai dengan instruksi yang diberikan.
+
+## Langkah 4: Instalasi Editor Kode
+
+### 4.1. Visual Studio Code (Direkomendasikan)
+
+1. Unduh dan instal [Visual Studio Code](https://code.visualstudio.com/).
+2. Buka Visual Studio Code dan navigasikan ke **Extensions** (ikon kotak di sisi kiri).
+3. Cari dan instal ekstensi Flutter dan Dart.
+
+### 4.2. Android Studio
+
+1. Unduh dan instal [Android Studio](https://developer.android.com/studio).
+2. Buka Android Studio dan instal plugin Flutter dan Dart:
+   - Buka **Plugins** dari **Preferences** atau **Settings**.
+   - Cari "Flutter" dan instal plugin Flutter. Plugin Dart akan terinstal secara otomatis.
+
+## Langkah 5: Setup Emulator atau Perangkat Fisik
+
+### 5.1. Emulator Android
+
+1. Buka **Android Studio** > **AVD Manager**.
+2. Buat perangkat virtual baru (AVD) dan pilih konfigurasi perangkat yang diinginkan.
+3. Mulai perangkat virtual dari AVD Manager.
+
+### 5.2. Perangkat Fisik
+
+1. Aktifkan **Developer options** dan **USB debugging** pada perangkat Android Anda.
+2. Sambungkan perangkat ke komputer melalui USB.
+
+## Langkah 6: Buat dan Jalankan Aplikasi Flutter
+
+1. Buka **Command Prompt** atau **PowerShell**.
+2. Jalankan perintah berikut untuk membuat aplikasi Flutter baru:
+
+```shell
+   flutter create my_app
+```
+
+1. Pindah ke direktori proyek baru:
+
+```shell
+   cd my_app
+```
+
+1. Jalankan aplikasi di emulator atau perangkat yang terhubung:
+
+```shell
+   flutter run
+```
+
+Jika semua langkah telah diikuti dengan benar, Anda sekarang seharusnya melihat aplikasi Flutter default berjalan di emulator atau perangkat Anda.
+
+Selamat mencoba mengembangkan aplikasi dengan Flutter!
